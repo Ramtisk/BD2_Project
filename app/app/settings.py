@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app',
+    'ficha2',
+    'ficha4'
 ]
 
 MIDDLEWARE = [
@@ -75,11 +78,28 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'bdII_19866',
+        'USER': 'postgres',
+        'HOST': 'postgres',
+        'PASSWORD': 'postgres',
+        'PORT': '5432',
+    },
+    'mongodb': {
+        'ENGINE': 'djongo',
+        'NAME': 'bdII_19866',
+        'CLIENT': {
+            'host': 'mongo',
+            'port': 27017,
+            'username': 'root',
+            'password': 'root',
+            'authSource': '',
+            'authMechanism': 'SCRAM-SHA-1'
+        },
     }
 }
 
+DATABASE_ROUTERS = ['app.routers.MongoDBRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
