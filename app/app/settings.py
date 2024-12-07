@@ -73,14 +73,13 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'djongo',
-        'NAME': str(os.getenv('MONGO_DB_NAME')),
+        'NAME': str(os.getenv('MONGODB_DB')),
         'CLIENT': {
             'host': 'mongo',
             'port': 27017,
-            'username': str(os.getenv('MONGO_DB_ROOT_USERNAME')),
-            'password': str(os.getenv('MONGO_DB_ROOT_PASSWORD')),
-            'authSource': '',
-            'authMechanism': 'SCRAM-SHA-1'
+            'username': str(os.getenv('MONGODB_USER')),
+            'password': str(os.getenv('MONGODB_PASSWORD')),
+            'authSource': ''
         },
     }
 }
