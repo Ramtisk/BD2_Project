@@ -1,0 +1,8 @@
+<!-- myapp/templates/myapp/item_confirm_delete.html -->
+<h1>Delete Item</h1>
+<p>Are you sure you want to delete "{{ item.name }}"?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Confirm</button>
+</form>
+<a href="{% url 'DevicesTypeList' %}">Cancel</a>

@@ -8,3 +8,4 @@ redis==3.5.3
 Faker
 python-dotenv
 djongo
+django-bootstrap-v5
