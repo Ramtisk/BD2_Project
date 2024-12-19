@@ -1,46 +1,49 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.http import HttpResponse
-
-# /app/project/templates/views.py
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from .models import DevicesType
-from .forms import ItemForm
+from .forms import ItemFormDevicesType
 
-def DevicesTypeList(request):
-    items = DevicesType.objects.all()
-    return render(request, '/app/project/templates/item_list.html', {'items': items})
+import json
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
+from .models import DevicesType
+from .forms import ItemFormDevicesType
 
-def DevicesTypeFind(request, pk):
-    item = get_object_or_404(DevicesType, pk=pk)
-    return render(request, '/app/project/templates/item_detail.html', {'item': item})
-
-def DevicesTypeCreate(request):
+def DevicesTypeView(request, pk=None):
     if request.method == 'POST':
-        form = ItemForm(request.POST)
+        data = json.loads(request.body)
+        form = ItemFormDevicesType(data)
         if form.is_valid():
             form.save()
-            return redirect('DevicesTypeList')
-    else:
-        form = ItemForm()
-    return render(request, '/app/project/templates/item_form.html', {'form': form})
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
 
-def DevicesTypeUpdate(request, pk):
-    item = get_object_or_404(DevicesType, pk=pk)
-    if request.method == 'PUT':
-        form = ItemForm(request.PUT, instance=item)
+    elif request.method == 'PUT':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for PUT request.")
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        item = get_object_or_404(DevicesType, pk=pk)
+        form = ItemFormDevicesType(data, instance=item)
         if form.is_valid():
             form.save()
-            return redirect('DevicesTypeList')
-    else:
-        form = ItemForm(instance=item)
-    return render(request, '/app/project/templates/item_form.html', {'form': form})
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
 
-def DevicesTypeDelete(request, pk):
-    item = get_object_or_404(DevicesType, pk=pk)
-    print('Delete Device ')
-    if request.method == 'POST':
+    elif request.method == 'DELETE':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for DELETE request.")
+        item = get_object_or_404(DevicesType, pk=pk)
         item.delete()
-        return redirect('DevicesTypeList')
-    return render(request, '/app/project/templates/item_confirm_delete.html', {'item': item})
+        return JsonResponse({'success': True})
+
+    elif request.method == 'GET': 
+        items = DevicesType.objects.all()
+        form = ItemFormDevicesType()
+        return render(request, 'devicesType.html', {'items': items, 'form': form})
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
