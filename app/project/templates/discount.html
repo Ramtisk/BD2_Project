@@ -1,0 +1,187 @@
+{% extends "index.html" %}
+
+{% block content%}
+    <h1>discount</h1>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#discountModal" onclick="openCreateModal()">
+        <i class="fa fa-plus"></i> Add discount
+    </button>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">password</th>
+                <th scope="col">percent</th>
+                <th scope="col">start date</th>
+                <th scope="col">end date</th>
+                <th scope="col">active</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <th scope="row">{{ item.pk }}</th>
+                <td>{{ item.password }}</td>
+                <td>{{ item.percent }}</td>
+                <td>{{ item.start_date }}</td>
+                <td>{{ item.end_date }}</td>
+                <td>{{ item.active }}</td>
+                <td>
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-outline-secondary" 
+                        data-toggle="modal" 
+                        data-target="#discountModal" 
+                        onclick="openEditModal('{{item.pk}}','{{item.password}}','{{item.percent}}','{{item.start_date}}','{{item.end_date}}','{{item.active}}')"
+                    >
+                        Edit
+                    </button>
+                </td>                
+                <td>
+                    <button 
+                        class="btn btn-sm btn-outline-danger" 
+                        onclick="deleteRequest({{ item.pk }})">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="discountModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="discountModalTitle">Create Item</h1>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="discountForm" onsubmit="handleSubmit(event)">
+                        {% csrf_token %}
+                        <input type="hidden" id="formMethod" value="POST">
+                        <input type="hidden" id="itemPk" value="">
+                        {{ form.as_p }}
+                        <div class="d-flex mt-4">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>    
+
+
+    <script>
+        function openCreateModal() {
+            document.getElementById('discountForm').reset();
+            document.getElementById('discountModalTitle').innerText = "Create Item";
+            document.getElementById('formMethod').value = "POST";
+
+            document.getElementById('itemPk').value = "";
+            document.querySelector('input[name="password"]').value = "";
+            document.querySelector('input[name="percent"]').value = "";
+            document.querySelector('input[name="start_date"]').value = "";
+            document.querySelector('input[name="end_date"]').value = "";
+            document.querySelector('input[name="active"]').value = "";
+        }
+        
+        function openEditModal(pk,password,percent,start_date,end_date,active) {
+            document.getElementById('discountModalTitle').innerText = "Edit Item";
+            document.getElementById('formMethod').value = "PUT";
+
+            document.getElementById('itemPk').value = pk;
+            document.querySelector('input[name="password"]').value = password;
+            document.querySelector('input[name="percent"]').value = percent;
+            document.querySelector('input[name="start_date"]').value = start_date;
+            document.querySelector('input[name="end_date"]').value = end_date;
+            document.querySelector('input[name="active"]').value = active;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const url = document.getElementById('formMethod').value === 'POST' 
+                ? '/v1/discount/' 
+                : `/v1/discount/${document.getElementById('itemPk').value}/`;
+            const method = document.getElementById('formMethod').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(document.getElementById('discountForm'));
+            const payload = Object.fromEntries(formData.entries());
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item saved successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to save item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function deleteRequest(pk) {
+            const url = `/v1/discount/${pk}/`;  // URL para a ação DELETE
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,  // Envia o token CSRF para segurança
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAlldiscount() {
+            fetch('/v1/discount/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('All discount:', data.items);
+                })
+                .catch(error => console.error('Error fetching discount:', error));
+        }
+
+        function fetchdiscountById(pk) {
+            fetch(`/v1/discount/${pk}/`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('discount not found');
+                })
+                .then(data => {
+                    console.log('discount:', data);
+                })
+                .catch(error => console.error('Error fetching discount:', error));
+        }
+
+    </script>
+        
+{% endblock %}

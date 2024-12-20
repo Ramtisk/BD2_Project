@@ -50,7 +50,7 @@ class Discount(models.Model):
     class Meta:
         managed = True
         db_table = 'discount'
-
+        
 
 class Inventory(models.Model):
     inventory_id = models.AutoField(primary_key=True)
@@ -80,7 +80,6 @@ class Payment(models.Model):
 
 class Plan(models.Model):
     plan_id = models.AutoField(primary_key=True)
-    password = models.CharField(max_length=256, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     service_type = models.IntegerField(blank=True, null=True)

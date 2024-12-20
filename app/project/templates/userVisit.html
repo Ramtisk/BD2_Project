@@ -1,0 +1,172 @@
+{% extends "index.html" %}
+
+{% block content%}
+    <h1>UserVisit</h1>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#UserVisitModal" onclick="openCreateModal()">
+        <i class="fa fa-plus"></i> Add UserVisit
+    </button>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">user</th>
+                <th scope="col">tecnical_visit</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <th scope="row">{{ item.user }}</th>
+                <td>{{ item.tecnical_visit }}</td>
+                <td>
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-outline-secondary" 
+                        data-toggle="modal" 
+                        data-target="#UserVisitModal" 
+                        onclick="openEditModal('{{item.user}}','{{item.tecnical_visit}}','{{item.user}}','{{item.amount}}','{{item.date}}','{{item.entity}}')"
+                    >
+                        Edit
+                    </button>
+                </td>                
+                <td>
+                    <button 
+                        class="btn btn-sm btn-outline-danger" 
+                        onclick="deleteRequest({{ item.user }})">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="UserVisitModal" tabindex="-1" role="dialog" aria-labelledby="UserVisitModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="UserVisitModalTitle">Create Item</h1>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="UserVisitForm" onsubmit="handleSubmit(event)">
+                        {% csrf_token %}
+                        <input type="hidden" id="formMethod" value="POST">
+                        <input type="hidden" id="itemuser" value="">
+                        {{ form.as_p }}
+                        <div class="d-flex mt-4">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>    
+
+
+    <script>
+        function openCreateModal() {
+            document.getElementById('UserVisitForm').reset();
+            document.getElementById('UserVisitModalTitle').innerText = "Create Item";
+            document.getElementById('formMethod').value = "POST";
+
+            document.getElementById('itemuser').value = "";
+            document.querySelector('input[name="tecnical_visit"]').value = "";
+        }
+        
+        function openEditModal(user,tecnical_visit) {
+            document.getElementById('UserVisitModalTitle').innerText = "Edit Item";
+            document.getElementById('formMethod').value = "PUT";
+
+            document.getElementById('itemuser').value = user;
+            document.querySelector('input[name="tecnical_visit"]').value = tecnical_visit;
+           
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const url = document.getElementById('formMethod').value === 'POST' 
+                ? '/v1/plan_tecnical_visit/' 
+                : `/v1/plan_tecnical_visit/${document.getElementById('itemuser').value}/`;
+            const method = document.getElementById('formMethod').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(document.getElementById('UserVisitForm'));
+            const payload = Object.fromEntries(formData.entries());
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item saved successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to save item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function deleteRequest(user) {
+            const url = `/v1/plan_tecnical_visit/${user}/`;  // URL para a ação DELETE
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,  // Envia o token CSRF para segurança
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAllUserVisit() {
+            fetch('/v1/plan_tecnical_visit/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('All UserVisit:', data.items);
+                })
+                .catch(error => console.error('Error fetching UserVisit:', error));
+        }
+
+        function fetchUserVisitById(user) {
+            fetch(`/v1/plan_tecnical_visit/${user}/`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('UserVisit not found');
+                })
+                .then(data => {
+                    console.log('UserVisit:', data);
+                })
+                .catch(error => console.error('Error fetching UserVisit:', error));
+        }
+
+    </script>
+        
+{% endblock %}
