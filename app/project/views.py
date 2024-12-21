@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 from .models import DevicesType,Address,Device,Discount,Inventory,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,UserVisit,TecnicalVisit
-from .forms import ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormInventory,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit,ItemFormUserVisit
+from .forms import ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormInventory,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit,ItemFormUserVisit
 
 def DevicesTypeView(request, pk=None):
     if request.method == 'POST':
@@ -317,7 +317,7 @@ def PlanSubscriptionView(request, pk=None):
 def SubcriptionView(request, pk=None):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = ItemFormSubcription(data)
+        form = ItemFormSubscription(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -331,8 +331,8 @@ def SubcriptionView(request, pk=None):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        item = get_object_or_404(Subcription, pk=pk)
-        form = ItemFormSubcription(data, instance=item)
+        item = get_object_or_404(Subscription, pk=pk)
+        form = ItemFormSubscription(data, instance=item)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -341,14 +341,14 @@ def SubcriptionView(request, pk=None):
     elif request.method == 'DELETE':
         if pk is None:
             return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(Subcription, pk=pk)
+        item = get_object_or_404(Subscription, pk=pk)
         item.delete()
         return JsonResponse({'success': True})
 
     elif request.method == 'GET': 
-        items = Subcription.objects.all()
-        form = ItemFormSubcription()
-        return render(request, 'subcription.html', {'items': items, 'form': form})
+        items = Subscription.objects.all()
+        form = ItemFormSubscription()
+        return render(request, 'Subscription.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 

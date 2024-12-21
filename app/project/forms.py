@@ -29,7 +29,7 @@ class ItemFormDevicesType(forms.ModelForm):
         'rows': 3,
         'id': 'exampleFormControlTextarea2'
     }))
-    image = forms.FileField(widget=forms.ClearableFileInput(attrs={
+    image = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control-file',
         'id': 'exampleFormControlFile1'
     }))
