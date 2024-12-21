@@ -39,12 +39,7 @@ class ItemFormDevice(forms.ModelForm):
         model = Device
         fields = ['device_type', 'inventory', 'plan', 'installation_date', 'serial_number']
     
-    installation_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-        'id': 'exampleFormControlDataField'
-    }))
-
+    installation_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
 
     serial_number = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
@@ -67,15 +62,8 @@ class ItemFormDiscount(forms.ModelForm):
         'rows': 3,
     }))
 
-    start_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-    }))
-
-    end_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-    }))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
 
     # active = forms.BooleanField(widget=forms.Bo(attrs={
     #     'class': 'form-control',
@@ -102,10 +90,7 @@ class ItemFormPayment(forms.ModelForm):
         'rows': 3,
     }))
 
-    date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-    }))
+    date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
 
     entity = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
@@ -166,16 +151,9 @@ class ItemFormSubscription(forms.ModelForm):
         model = Subscription
         fields = ['user', 'discount', 'start_date','end_date']
 
-    start_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-        'id': 'exampleFormControlTextarea'
-    }))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
     
-    end_date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-    }))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
 
 class ItemFormTecnicalVisit(forms.ModelForm):
     class Meta:
@@ -188,10 +166,7 @@ class ItemFormTecnicalVisit(forms.ModelForm):
         'id': 'exampleFormControlTextarea'
     }))
 
-    date = forms.DateField(widget=forms.DateInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-    }))
+    date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datetimepicker'}))
 
 class ItemFormUserVisit(forms.ModelForm):
     class Meta:

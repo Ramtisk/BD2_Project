@@ -20,7 +20,7 @@ class Device(models.Model):
     device_type = models.ForeignKey('DevicesType', models.DO_NOTHING)
     inventory = models.ForeignKey('Inventory', models.DO_NOTHING)
     plan = models.ForeignKey('Plan', models.DO_NOTHING)
-    installation_date = models.DateField(blank=True, null=True)
+    installation_date = models.DateTimeField(blank=True, null=True)
     serial_number = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -43,8 +43,8 @@ class Discount(models.Model):
     discount_id = models.AutoField(primary_key=True)
     password = models.CharField(max_length=256, blank=True, null=True)
     percent = models.IntegerField(blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     active = models.BooleanField(blank=True, null=True)
 
     class Meta:
@@ -67,7 +67,7 @@ class Payment(models.Model):
     subscription = models.ForeignKey('Subscription', models.DO_NOTHING)
     user = models.ForeignKey(User, models.DO_NOTHING)
     amount = models.FloatField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
     entity = models.TextField(blank=True, null=True)
     refence = models.TextField(blank=True, null=True)
     api = models.TextField(blank=True, null=True)
@@ -113,8 +113,8 @@ class Subscription(models.Model):
     subscription_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING)
     discount = models.ForeignKey(Discount, models.DO_NOTHING, blank=True, null=True)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -125,7 +125,7 @@ class TecnicalVisit(models.Model):
     tecnical_visit_id = models.AutoField(primary_key=True)
     device = models.ForeignKey(Device, models.DO_NOTHING)
     note = models.TextField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True

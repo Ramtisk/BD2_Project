@@ -7,6 +7,9 @@
   {% bootstrap_javascript %}
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.0.0/css/tempus-dominus.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.0.0/js/tempus-dominus.min.js"></script>
 
 </head>
 <body>
@@ -73,5 +76,24 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      new tempusDominus.TempusDominus(document.querySelector('.datetimepicker'), {
+        display: {
+          components: {
+            calendar: true,
+            date: true,
+            month: true,
+            year: true,
+            decades: true,
+            clock: true,
+            hours: true,
+            minutes: true,
+            seconds: false
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>
