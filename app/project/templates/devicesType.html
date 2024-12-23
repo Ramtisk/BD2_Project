@@ -75,17 +75,18 @@
             document.getElementById('deviceTypeModalTitle').innerText = "Create Item";
             document.getElementById('formMethod').value = "POST";
             document.getElementById('itemPk').value = "";
-            document.querySelector('textarea[name="name"]').value = "";
-            document.querySelector('textarea[name="description"]').value = "";
+            document.querySelector('input[name="name"]').value = "";
+            document.querySelector('input[name="description"]').value = "";
+            document.querySelector('input[name="image"]').value = "";
         }
         
         function openEditModal(pk, name, description, image) {
             document.getElementById('deviceTypeModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
             document.getElementById('itemPk').value = pk;
-            document.querySelector('textarea[name="name"]').value = name;
-            document.querySelector('textarea[name="description"]').value = description;
-            // Preencher outros campos, como imagem, se necessário.
+            document.querySelector('input[name="name"]').value = name;
+            document.querySelector('input[name="description"]').value = description;
+            document.querySelector('input[name="image"]').value = image;
         }
 
         function handleSubmit(event) {
@@ -118,7 +119,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
-
 
         function deleteDeviceType(pk) {
             const url = `/v1/devices_type/${pk}/`;  // URL para a ação DELETE

@@ -1,17 +1,18 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>UserVisit</h1>
+    <h1>Plan Device</h1>
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#UserVisitModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add UserVisit
+    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#SubcriptionVisitModal" onclick="openCreateModal()">
+        <i class="fa fa-plus"></i> Add Plan Device
     </button>
     
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">user</th>
-                <th scope="col">tecnical_visit</th>
+                <th scope="col">#</th>
+                <th scope="col">plan</th>
+                <th scope="col">device</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -19,15 +20,16 @@
         <tbody>
         {% for item in items %}
             <tr>
-                <th scope="row">{{ item.user }}</th>
-                <td>{{ item.tecnical_visit }}</td>
+                <th scope="row">{{ item.pk }}</th>
+                <td>{{ item.plan }}</th>
+                <td>{{ item.device }}</td>
                 <td>
                     <button 
                         type="button" 
                         class="btn btn-sm btn-outline-secondary" 
                         data-toggle="modal" 
-                        data-target="#UserVisitModal" 
-                        onclick="openEditModal('{{item.user}}','{{item.tecnical_visit}}','{{item.user}}','{{item.amount}}','{{item.date}}','{{item.entity}}')"
+                        data-target="#SubcriptionVisitModal" 
+                        onclick="openEditModal('{{item.plan}}','{{item.device}}')"
                     >
                         Edit
                     </button>
@@ -35,7 +37,7 @@
                 <td>
                     <button 
                         class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.user }})">
+                        onclick="deleteRequest({{ item.pk }})">
                         Delete
                     </button>
                 </td>
@@ -45,20 +47,20 @@
     </table>
 
     <!-- Modal -->
-    <div class="modal fade" id="UserVisitModal" tabindex="-1" role="dialog" aria-labelledby="UserVisitModal" aria-hidden="true">
+    <div class="modal fade" id="SubcriptionVisitModal" tabindex="-1" role="dialog" aria-labelledby="SubcriptionVisitModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="UserVisitModalTitle">Create Item</h1>
+                    <h1 class="modal-title" id="SubcriptionVisitModalTitle">Create Item</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="UserVisitForm" onsubmit="handleSubmit(event)">
+                    <form id="SubcriptionVisitForm" onsubmit="handleSubmit(event)">
                         {% csrf_token %}
                         <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemuser" value="">
+                        <input type="hidden" id="itemplan" value="">
                         {{ form.as_p }}
                         <div class="d-flex mt-4">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -73,20 +75,20 @@
 
     <script>
         function openCreateModal() {
-            document.getElementById('UserVisitForm').reset();
-            document.getElementById('UserVisitModalTitle').innerText = "Create Item";
+            document.getElementById('SubcriptionVisitForm').reset();
+            document.getElementById('SubcriptionVisitModalTitle').innerText = "Create Item";
             document.getElementById('formMethod').value = "POST";
 
-            document.getElementById('itemuser').value = "";
-            document.querySelector('input[name="tecnical_visit"]').value = "";
+            document.getElementById('itemplan').value = "";
+            document.querySelector('input[name="device"]').value = "";
         }
         
-        function openEditModal(user,tecnical_visit) {
-            document.getElementById('UserVisitModalTitle').innerText = "Edit Item";
+        function openEditModal(plan,device) {
+            document.getElementById('SubcriptionVisitModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
-            document.getElementById('itemuser').value = user;
-            document.querySelector('input[name="tecnical_visit"]').value = tecnical_visit;
+            document.getElementById('itemplan').value = plan;
+            document.querySelector('input[name="device"]').value = device;
            
         }
 
@@ -94,12 +96,12 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/plan_tecnical_visit/' 
-                : `/v1/plan_tecnical_visit/${document.getElementById('itemuser').value}/`;
+                ? '/v1/plan_device/' 
+                : `/v1/plan_device/${document.getElementById('itemplan').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            const formData = new FormData(document.getElementById('UserVisitForm'));
+            const formData = new FormData(document.getElementById('SubcriptionVisitForm'));
             const payload = Object.fromEntries(formData.entries());
 
             fetch(url, {
@@ -122,8 +124,8 @@
         }
 
 
-        function deleteRequest(user) {
-            const url = `/v1/plan_tecnical_visit/${user}/`;  // URL para a ação DELETE
+        function deleteRequest(plan) {
+            const url = `/v1/plan_device/${plan}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -144,27 +146,27 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        function fetchAllUserVisit() {
-            fetch('/v1/plan_tecnical_visit/')
+        function fetchAllSubcriptionVisit() {
+            fetch('/v1/plan_device/')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('All UserVisit:', data.items);
+                    console.log('All SubcriptionVisit:', data.items);
                 })
-                .catch(error => console.error('Error fetching UserVisit:', error));
+                .catch(error => console.error('Error fetching SubcriptionVisit:', error));
         }
 
-        function fetchUserVisitById(user) {
-            fetch(`/v1/plan_tecnical_visit/${user}/`)
+        function fetchSubcriptionVisitById(plan) {
+            fetch(`/v1/plan_device/${plan}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();
                     }
-                    throw new Error('UserVisit not found');
+                    throw new Error('SubcriptionVisit not found');
                 })
                 .then(data => {
-                    console.log('UserVisit:', data);
+                    console.log('SubcriptionVisit:', data);
                 })
-                .catch(error => console.error('Error fetching UserVisit:', error));
+                .catch(error => console.error('Error fetching SubcriptionVisit:', error));
         }
 
     </script>

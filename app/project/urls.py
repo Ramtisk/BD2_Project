@@ -33,4 +33,7 @@ urlpatterns = [
 
     path('tecnical_visit/', views.TecnicalVisitView, name='TecnicalVisit'),
     path('tecnical_visit/<int:pk>/', views.TecnicalVisitView, name='TecnicalVisitDetail'),
+
+    path('plan_device/', views.PlanDeviceView, name='PlanDevice'),
+    path('plan_device/<int:pk>/', views.PlanDeviceView, name='PlanDeviceDetail'),
 ]

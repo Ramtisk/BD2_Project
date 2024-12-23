@@ -1,10 +1,10 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>discount</h1>
+    <h1>Discount</h1>
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#discountModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add discount
+        <i class="fa fa-plus"></i> Add Discount
     </button>
     
     <table class="table table-striped">
@@ -12,8 +12,6 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">percent</th>
-                <th scope="col">start date</th>
-                <th scope="col">end date</th>
                 <th scope="col">active</th>
                 <th></th>
                 <th></th>
@@ -24,8 +22,6 @@
             <tr>
                 <th scope="row">{{ item.pk }}</th>
                 <td>{{ item.percent }}</td>
-                <td>{{ item.start_date }}</td>
-                <td>{{ item.end_date }}</td>
                 <td>{{ item.active }}</td>
                 <td>
                     <button 
@@ -33,7 +29,7 @@
                         class="btn btn-sm btn-outline-secondary" 
                         data-toggle="modal" 
                         data-target="#discountModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.percent}}','{{item.start_date}}','{{item.end_date}}','{{item.active}}')"
+                        onclick="openEditModal('{{item.pk}}','{{item.percent}}','{{item.active}}')"
                     >
                         Edit
                     </button>
@@ -85,19 +81,15 @@
 
             document.getElementById('itemPk').value = "";
             document.querySelector('input[name="percent"]').value = "";
-            document.querySelector('input[name="start_date"]').value = "";
-            document.querySelector('input[name="end_date"]').value = "";
             document.querySelector('input[name="active"]').value = "";
         }
         
-        function openEditModal(pk,percent,start_date,end_date,active) {
+        function openEditModal(pk,percent,active) {
             document.getElementById('discountModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
             document.getElementById('itemPk').value = pk;
             document.querySelector('input[name="percent"]').value = percent;
-            document.querySelector('input[name="start_date"]').value = start_date;
-            document.querySelector('input[name="end_date"]').value = end_date;
             document.querySelector('input[name="active"]').value = active;
         }
 

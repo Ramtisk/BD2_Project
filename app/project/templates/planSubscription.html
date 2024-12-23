@@ -11,6 +11,7 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
+                <th scope="col">plan</th>
                 <th scope="col">subscription</th>
                 <th></th>
                 <th></th>
@@ -20,6 +21,7 @@
         {% for item in items %}
             <tr>
                 <th scope="row">{{ item.pk }}</th>
+                <td>{{ item.plan }}</td>
                 <td>{{ item.subscription }}</td>
                 <td>
                     <button 
@@ -78,14 +80,16 @@
             document.getElementById('formMethod').value = "POST";
 
             document.getElementById('itemPk').value = "";
+            document.querySelector('input[name="plan"]').value = plan;
             document.querySelector('input[name="subscription"]').value = "";
         }
         
-        function openEditModal(pk,subscription) {
+        function openEditModal(pk,plan,subscription) {
             document.getElementById('PlanSubscriptionModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
             document.getElementById('itemPk').value = pk;
+            document.querySelector('input[name="plan"]').value = plan;
             document.querySelector('input[name="subscription"]').value = subscription;
            
         }

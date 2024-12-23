@@ -12,8 +12,6 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">device type</th>
-                <th scope="col">inventory</th>
-                <th scope="col">plan</th>
                 <th scope="col">installation date</th>
                 <th scope="col">serial_number</th>
                 <th></th>
@@ -25,8 +23,6 @@
             <tr>
                 <th scope="row">{{ item.pk }}</th>
                 <td>{{ item.device_type }}</td>
-                <td>{{ item.inventory }}</td>
-                <td>{{ item.plan }}</td>
                 <td>{{ item.installation_date }}</td>
                 <td>{{ item.serial_number }}</td>
                 <td>
@@ -35,7 +31,7 @@
                         class="btn btn-sm btn-outline-secondary" 
                         data-toggle="modal" 
                         data-target="#deviceModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.device_type}}','{{item.inventory}}','{{item.plan}}','{{item.installation_date}}','{{item.serial_number}}')"
+                        onclick="openEditModal('{{item.pk}}','{{item.device_type}}','{{item.installation_date}}','{{item.serial_number}}')"
                     >
                         Edit
                     </button>
@@ -87,20 +83,16 @@
 
             document.getElementById('itemPk').value = "";
             document.querySelector('input[name="device_type"]').value = "";
-            document.querySelector('input[name="inventory"]').value = "";
-            document.querySelector('input[name="plan"]').value = "";
             document.querySelector('input[name="installation_date"]').value = "";
             document.querySelector('input[name="serial_number"]').value = "";
         }
         
-        function openEditModal(pk,device_type,inventory,plan,installation_date,serial_number) {
+        function openEditModal(pk,device_type,installation_date,serial_number) {
             document.getElementById('deviceModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
             document.getElementById('itemPk').value = pk;
             document.querySelector('input[name="device_type"]').value = device_type;
-            document.querySelector('input[name="inventory"]').value = inventory;
-            document.querySelector('input[name="plan"]').value = plan;
             document.querySelector('input[name="installation_date"]').value = installation_date;
             document.querySelector('input[name="serial_number"]').value = serial_number;
         }

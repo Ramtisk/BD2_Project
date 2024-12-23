@@ -17,8 +17,6 @@
                 <th scope="col">date</th>
                 <th scope="col">entity</th>
                 <th scope="col">refence</th>
-                <th scope="col">api</th>
-                <th scope="col">cell number</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -33,8 +31,6 @@
                 <td>{{ item.date }}</td>
                 <td>{{ item.entity }}</td>
                 <td>{{ item.refence }}</td>
-                <td>{{ item.api }}</td>
-                <td>{{ item.cell_number }}</td>
                 <td>
                     <button 
                         type="button" 
@@ -98,11 +94,9 @@
             document.querySelector('input[name="date"]').value = "";
             document.querySelector('input[name="entity"]').value = "";
             document.querySelector('input[name="refence"]').value = "";
-            document.querySelector('input[name="api"]').value = "";
-            document.querySelector('input[name="cell_number"]').value = "";
         }
         
-        function openEditModal(pk,subscription,user,amount,date,entity,refence,api,cell_number) {
+        function openEditModal(pk,subscription,user,amount,date,entity,refence) {
             document.getElementById('PaymentModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
@@ -112,17 +106,15 @@
             document.querySelector('input[name="amount"]').value = amount;
             document.querySelector('input[name="date"]').value = date;
             document.querySelector('input[name="entity"]').value = entity;
-            document.querySelector('input[name="refence"]').value = "";
-            document.querySelector('input[name="api"]').value = "";
-            document.querySelector('input[name="cell_number"]').value = "";
+            document.querySelector('input[name="refence"]').value = refence;
         }
 
         function handleSubmit(event) {
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/Payment/' 
-                : `/v1/Payment/${document.getElementById('itemPk').value}/`;
+                ? '/v1/payment/' 
+                : `/v1/payment/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -150,7 +142,7 @@
 
 
         function deleteRequest(pk) {
-            const url = `/v1/Payment/${pk}/`;  // URL para a ação DELETE
+            const url = `/v1/payment/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {

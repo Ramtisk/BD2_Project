@@ -6,46 +6,9 @@ from .forms import ItemFormDevicesType
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
-from .models import DevicesType,Address,Device,Discount,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,TecnicalVisit
-from .forms import ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit
+from .models import PlanDevice,DevicesType,Address,Device,Discount,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,TecnicalVisit
+from .forms import ItemFormPlanDevice,ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit
 
-def DevicesTypeView(request, pk=None):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        form = ItemFormDevicesType(data)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'PUT':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for PUT request.")
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        item = get_object_or_404(DevicesType, pk=pk)
-        form = ItemFormDevicesType(data, instance=item)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'DELETE':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(DevicesType, pk=pk)
-        item.delete()
-        return JsonResponse({'success': True})
-
-    elif request.method == 'GET': 
-        items = DevicesType.objects.all()
-        form = ItemFormDevicesType()
-        return render(request, 'devicesType.html', {'items': items, 'form': form})
-
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def AddressView(request, pk=None):
     if request.method == 'POST':
@@ -82,6 +45,44 @@ def AddressView(request, pk=None):
         items = Address.objects.all()
         form = ItemFormAddress()
         return render(request, 'address.html', {'items': items, 'form': form})
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def DevicesTypeView(request, pk=None):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        form = ItemFormDevicesType(data)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
+
+    elif request.method == 'PUT':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for PUT request.")
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        item = get_object_or_404(DevicesType, pk=pk)
+        form = ItemFormDevicesType(data, instance=item)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
+
+    elif request.method == 'DELETE':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for DELETE request.")
+        item = get_object_or_404(DevicesType, pk=pk)
+        item.delete()
+        return JsonResponse({'success': True})
+
+    elif request.method == 'GET': 
+        items = DevicesType.objects.all()
+        form = ItemFormDevicesType()
+        return render(request, 'devicesType.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -161,44 +162,6 @@ def DiscountView(request, pk=None):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def PaymentView(request, pk=None):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        form = ItemFormPayment(data)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'PUT':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for PUT request.")
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        item = get_object_or_404(Payment, pk=pk)
-        form = ItemFormPayment(data, instance=item)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'DELETE':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(Payment, pk=pk)
-        item.delete()
-        return JsonResponse({'success': True})
-
-    elif request.method == 'GET': 
-        items = Payment.objects.all()
-        form = ItemFormPayment()
-        return render(request, 'payment.html', {'items': items, 'form': form})
-
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
 def PlanView(request, pk=None):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -234,44 +197,6 @@ def PlanView(request, pk=None):
         items = Plan.objects.all()
         form = ItemFormPlan()
         return render(request, 'plan.html', {'items': items, 'form': form})
-
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-def PlanSubscriptionView(request, pk=None):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        form = ItemFormPlanSubscription(data)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'PUT':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for PUT request.")
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        item = get_object_or_404(PlanSubscription, pk=pk)
-        form = ItemFormPlanSubscription(data, instance=item)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'DELETE':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(PlanSubscription, pk=pk)
-        item.delete()
-        return JsonResponse({'success': True})
-
-    elif request.method == 'GET': 
-        items = PlanSubscription.objects.all()
-        form = ItemFormPlanSubscription()
-        return render(request, 'planSubscription.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -313,10 +238,10 @@ def SubcriptionView(request, pk=None):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def PlanSubscriptionView(request, pk=None):
+def PaymentView(request, pk=None):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = ItemFormPlanSubscription(data)
+        form = ItemFormPayment(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -330,8 +255,8 @@ def PlanSubscriptionView(request, pk=None):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        item = get_object_or_404(PlanSubscription, pk=pk)
-        form = ItemFormPlanSubscription(data, instance=item)
+        item = get_object_or_404(Payment, pk=pk)
+        form = ItemFormPayment(data, instance=item)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -340,14 +265,52 @@ def PlanSubscriptionView(request, pk=None):
     elif request.method == 'DELETE':
         if pk is None:
             return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(PlanSubscription, pk=pk)
+        item = get_object_or_404(Payment, pk=pk)
         item.delete()
         return JsonResponse({'success': True})
 
     elif request.method == 'GET': 
-        items = PlanSubscription.objects.all()
-        form = ItemFormPlanSubscription()
-        return render(request, 'planSubscription.html', {'items': items, 'form': form})
+        items = Payment.objects.all()
+        form = ItemFormPayment()
+        return render(request, 'payment.html', {'items': items, 'form': form})
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def TecnicalVisitView(request, pk=None):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        form = ItemFormTecnicalVisit(data)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
+
+    elif request.method == 'PUT':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for PUT request.")
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        item = get_object_or_404(TecnicalVisit, pk=pk)
+        form = ItemFormTecnicalVisit(data, instance=item)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        return JsonResponse({'error': form.errors}, status=400)
+
+    elif request.method == 'DELETE':
+        if pk is None:
+            return HttpResponseBadRequest("ID is required for DELETE request.")
+        item = get_object_or_404(TecnicalVisit, pk=pk)
+        item.delete()
+        return JsonResponse({'success': True})
+
+    elif request.method == 'GET': 
+        items = TecnicalVisit.objects.all()
+        form = ItemFormTecnicalVisit()
+        return render(request, 'tecnicalVisit.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -389,10 +352,10 @@ def SubcriptionVisitView(request, pk=None):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def SubscriptionView(request, pk=None):
+def PlanDeviceView(request, pk=None):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = ItemFormSubscription(data)
+        form = ItemFormPlanDevice(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -406,8 +369,8 @@ def SubscriptionView(request, pk=None):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        item = get_object_or_404(Subscription, pk=pk)
-        form = ItemFormSubscription(data, instance=item)
+        item = get_object_or_404(PlanDevice, pk=pk)
+        form = ItemFormPlanDevice(data, instance=item)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -416,21 +379,21 @@ def SubscriptionView(request, pk=None):
     elif request.method == 'DELETE':
         if pk is None:
             return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(Subscription, pk=pk)
+        item = get_object_or_404(PlanDevice, pk=pk)
         item.delete()
         return JsonResponse({'success': True})
 
     elif request.method == 'GET': 
-        items = Subscription.objects.all()
-        form = ItemFormSubscription()
-        return render(request, 'subscription.html', {'items': items, 'form': form})
+        items = PlanDevice.objects.all()
+        form = ItemFormPlanDevice()
+        return render(request, 'planDevice.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def TecnicalVisitView(request, pk=None):
+def PlanSubscriptionView(request, pk=None):
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = ItemFormTecnicalVisit(data)
+        form = ItemFormPlanSubscription(data)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -444,8 +407,8 @@ def TecnicalVisitView(request, pk=None):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        item = get_object_or_404(TecnicalVisit, pk=pk)
-        form = ItemFormTecnicalVisit(data, instance=item)
+        item = get_object_or_404(PlanSubscription, pk=pk)
+        form = ItemFormPlanSubscription(data, instance=item)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -454,13 +417,13 @@ def TecnicalVisitView(request, pk=None):
     elif request.method == 'DELETE':
         if pk is None:
             return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(TecnicalVisit, pk=pk)
+        item = get_object_or_404(PlanSubscription, pk=pk)
         item.delete()
         return JsonResponse({'success': True})
 
     elif request.method == 'GET': 
-        items = TecnicalVisit.objects.all()
-        form = ItemFormTecnicalVisit()
-        return render(request, 'tecnicalVisit.html', {'items': items, 'form': form})
+        items = PlanSubscription.objects.all()
+        form = ItemFormPlanSubscription()
+        return render(request, 'planSubscription.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
