@@ -16,9 +16,6 @@ urlpatterns = [
     path('discount/', views.DiscountView, name='Discount'),
     path('discount/<int:pk>/', views.DiscountView, name='DiscountDetail'),
 
-    path('inventory/', views.InventoryView, name='Inventory'),
-    path('inventory/<int:pk>/', views.InventoryView, name='InventoryDetail'),
-
     path('payment/', views.PaymentView, name='Payment'),
     path('payment/<int:pk>/', views.PaymentView, name='PaymentDetail'),
 
@@ -36,7 +33,4 @@ urlpatterns = [
 
     path('tecnical_visit/', views.TecnicalVisitView, name='TecnicalVisit'),
     path('tecnical_visit/<int:pk>/', views.TecnicalVisitView, name='TecnicalVisitDetail'),
-
-    path('user_visit/', views.UserVisitView, name='UserVisit'),
-    path('user_visit/<int:pk>/', views.UserVisitView, name='UserVisitDetail'),
 ]

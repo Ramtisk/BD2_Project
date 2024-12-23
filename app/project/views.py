@@ -5,10 +5,9 @@ from .forms import ItemFormDevicesType
 
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-from .models import DevicesType,Address,Device,Discount,Inventory,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,UserVisit,TecnicalVisit
-from .forms import ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormInventory,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit,ItemFormUserVisit
+from .models import DevicesType,Address,Device,Discount,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,TecnicalVisit
+from .forms import ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit
 
 def DevicesTypeView(request, pk=None):
     if request.method == 'POST':
@@ -159,44 +158,6 @@ def DiscountView(request, pk=None):
         items = Discount.objects.all()
         form = ItemFormDiscount()
         return render(request, 'discount.html', {'items': items, 'form': form})
-
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-def InventoryView(request, pk=None):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        form = ItemFormInventory(data)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'PUT':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for PUT request.")
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        item = get_object_or_404(Inventory, pk=pk)
-        form = ItemFormInventory(data, instance=item)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'DELETE':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(Inventory, pk=pk)
-        item.delete()
-        return JsonResponse({'success': True})
-
-    elif request.method == 'GET': 
-        items = Inventory.objects.all()
-        form = ItemFormInventory()
-        return render(request, 'inventory.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -501,43 +462,5 @@ def TecnicalVisitView(request, pk=None):
         items = TecnicalVisit.objects.all()
         form = ItemFormTecnicalVisit()
         return render(request, 'tecnicalVisit.html', {'items': items, 'form': form})
-
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-def UserVisitView(request, pk=None):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        form = ItemFormUserVisit(data)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'PUT':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for PUT request.")
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        item = get_object_or_404(UserVisit, pk=pk)
-        form = ItemFormUserVisit(data, instance=item)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'error': form.errors}, status=400)
-
-    elif request.method == 'DELETE':
-        if pk is None:
-            return HttpResponseBadRequest("ID is required for DELETE request.")
-        item = get_object_or_404(UserVisit, pk=pk)
-        item.delete()
-        return JsonResponse({'success': True})
-
-    elif request.method == 'GET': 
-        items = UserVisit.objects.all()
-        form = ItemFormUserVisit()
-        return render(request, 'userVisit.html', {'items': items, 'form': form})
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)

@@ -1,10 +1,10 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Subscription</h1>
+    <h1>subcription</h1>
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#SubscriptionModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Subscription
+    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#subcriptionModal" onclick="openCreateModal()">
+        <i class="fa fa-plus"></i> Add subcription
     </button>
     
     <table class="table table-striped">
@@ -32,8 +32,8 @@
                         type="button" 
                         class="btn btn-sm btn-outline-secondary" 
                         data-toggle="modal" 
-                        data-target="#SubscriptionModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.user}}','{{item.discount}}','{{item.start_date}}','{{item.start_date}}','{{item.entity}}')"
+                        data-target="#subcriptionModal" 
+                        onclick="openEditModal('{{item.pk}}','{{item.user}}','{{item.discount}}','{{item.start_date}}','{{item.end_date}}','{{item.entity}}')"
                     >
                         Edit
                     </button>
@@ -51,17 +51,17 @@
     </table>
 
     <!-- Modal -->
-    <div class="modal fade" id="SubscriptionModal" tabindex="-1" role="dialog" aria-labelledby="SubscriptionModal" aria-hidden="true">
+    <div class="modal fade" id="subcriptionModal" tabindex="-1" role="dialog" aria-labelledby="subcriptionModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="SubscriptionModalTitle">Create Item</h1>
+                    <h1 class="modal-title" id="subcriptionModalTitle">Create Item</h1>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="SubscriptionForm" onsubmit="handleSubmit(event)">
+                    <form id="subcriptionForm" onsubmit="handleSubmit(event)">
                         {% csrf_token %}
                         <input type="hidden" id="formMethod" value="POST">
                         <input type="hidden" id="itemPk" value="">
@@ -76,22 +76,15 @@
         </div>
     </div>    
 
-
     <script>
         function openCreateModal() {
-            document.getElementById('SubscriptionForm').reset();
-            document.getElementById('SubscriptionModalTitle').innerText = "Create Item";
+            document.getElementById('subcriptionForm').reset();
+            document.getElementById('subcriptionModalTitle').innerText = "Create Item";
             document.getElementById('formMethod').value = "POST";
-
-            document.getElementById('itemPk').value = "";
-            document.querySelector('input[name="user"]').value = "";
-            document.querySelector('input[name="discount"]').value = "";
-            document.querySelector('input[name="start_date"]').value = "";
-            document.querySelector('input[name="end_date"]').value = "";
         }
         
         function openEditModal(pk,user,discount,start_date,end_date) {
-            document.getElementById('SubscriptionModalTitle').innerText = "Edit Item";
+            document.getElementById('subcriptionModalTitle').innerText = "Edit Item";
             document.getElementById('formMethod').value = "PUT";
 
             document.getElementById('itemPk').value = pk;
@@ -105,12 +98,12 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/plan_subscription/' 
-                : `/v1/plan_subscription/${document.getElementById('itemPk').value}/`;
+                ? '/v1/subcription/' 
+                : `/v1/subcription/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            const formData = new FormData(document.getElementById('SubscriptionForm'));
+            const formData = new FormData(document.getElementById('subcriptionForm'));
             const payload = Object.fromEntries(formData.entries());
 
             fetch(url, {
@@ -132,9 +125,8 @@
                 .catch(error => console.error('Error:', error));
         }
 
-
         function deleteRequest(pk) {
-            const url = `/v1/plan_subscription/${pk}/`;  // URL para a ação DELETE
+            const url = `/v1/subcription/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -155,27 +147,27 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        function fetchAllSubscription() {
-            fetch('/v1/plan_subscription/')
+        function fetchAllsubcription() {
+            fetch('/v1/subcription/')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('All Subscription:', data.items);
+                    console.log('All subcription:', data.items);
                 })
-                .catch(error => console.error('Error fetching Subscription:', error));
+                .catch(error => console.error('Error fetching subcription:', error));
         }
 
-        function fetchSubscriptionById(pk) {
-            fetch(`/v1/plan_subscription/${pk}/`)
+        function fetchsubcriptionById(pk) {
+            fetch(`/v1/subcription/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();
                     }
-                    throw new Error('Subscription not found');
+                    throw new Error('subcription not found');
                 })
                 .then(data => {
-                    console.log('Subscription:', data);
+                    console.log('subcription:', data);
                 })
-                .catch(error => console.error('Error fetching Subscription:', error));
+                .catch(error => console.error('Error fetching subcription:', error));
         }
 
     </script>
