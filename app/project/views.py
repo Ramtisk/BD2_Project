@@ -6,9 +6,16 @@ from .forms import ItemFormDevicesType
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
-from .models import PlanDevice,DevicesType,Address,Device,Discount,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,TecnicalVisit
+from .models import AppLogs,PlanDevice,DevicesType,Address,Device,Discount,Payment,Plan,PlanSubscription,SubcriptionVisit,Subscription,TecnicalVisit
 from .forms import ItemFormPlanDevice,ItemFormSubscription,ItemFormDevicesType,ItemFormAddress,ItemFormDevice,ItemFormDiscount,ItemFormPayment,ItemFormPlan,ItemFormPlanSubscription,ItemFormSubcriptionVisit,ItemFormTecnicalVisit
 
+def log_action(action_type, table, action,description):
+    AppLogs.objects.create(
+        type=action_type,
+        tabela=table,
+        action=action,
+        description=description
+    )
 
 def AddressView(request, pk=None):
     if request.method == 'POST':
@@ -16,6 +23,7 @@ def AddressView(request, pk=None):
         form = ItemFormAddress(data)
         if form.is_valid():
             form.save()
+            log_action(request.method, 'Address', 'POST','Um endereco foi adicionado')
             return JsonResponse({'success': True})
         return JsonResponse({'error': form.errors}, status=400)
 

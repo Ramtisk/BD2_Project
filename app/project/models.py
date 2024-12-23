@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+class AppLogs(models.Model):
+    type = models.CharField(max_length=100)
+    tabela = models.CharField(max_length=100)
+    action = models.CharField(max_length=50)
+    description = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = True
+        app_label = 'mongo_app'
+        indexes = [models.Index(fields=['timestamp'])]
+
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)
     street = models.TextField()
