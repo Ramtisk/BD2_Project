@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Container principal */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #E9E9E9;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+
+        /* Linha para texto e imagem lado a lado */
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* Espaço entre o texto e o logo */
+            margin-bottom: 20px;
+        }
+
+        /* Texto ao lado do logo */
+        .logo-text {
+            font-size: 24px;
+            color: black;
+            font-weight: 400;
+        }
+
+        /* Logo */
+        .login-logo {
+            width: 100px; /* Define o tamanho da imagem */
+        }
+
+        /* Formulário */
+        .login-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Labels */
+        .form-label {
+            align-self: flex-start;
+            color: black;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* Inputs */
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid black;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        /* Botão de login */
+        .form-button {
+            width: 100%;
+            padding: 10px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-button:hover {
+            background-color: #333333;
+        }
+
+        /* Mensagens de erro */
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+
+        /* Rodapé */
+        .footer {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: black;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-header">
+            <h4 class="logo-text">Mauriciolda</h4>
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="login-logo">
+        </div>
+
+        <!-- Formulário -->
+        <form method="post" action="{% url 'login' %}" class="login-form">
+            {% csrf_token %}
+            <label for="username" class="form-label">Username:</label>
+            <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" required>
+
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
+
+            <button type="submit" class="form-button">Login</button>
+        </form>
+
+        <!-- Mensagens de erro -->
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error-message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>
