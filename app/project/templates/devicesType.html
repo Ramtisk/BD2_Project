@@ -1,0 +1,172 @@
+{% extends "index.html" %}
+
+{% block content%}
+    <div class="p-4">
+        <h1>Devices Types</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#deviceTypeModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Device Type
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Image</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.image }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#deviceTypeModal" onclick="openEditModal('{{ item.pk }}', '{{ item.name }}', '{{ item.description }}', '{{ item.image }}')">
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteDeviceType({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deviceTypeModal" tabindex="-1" role="dialog" aria-labelledby="deviceTypeModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="deviceTypeModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deviceForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+
+
+    <script>
+        function openCreateModal() {
+            document.getElementById('deviceForm').reset();
+            document.getElementById('deviceTypeModalTitle').innerText = "Create Item";
+            document.getElementById('formMethod').value = "POST";
+            document.getElementById('itemPk').value = "";
+            document.querySelector('input[name="name"]').value = "";
+            document.querySelector('input[name="description"]').value = "";
+            document.querySelector('input[name="image"]').value = "";
+        }
+        
+        function openEditModal(pk, name, description, image) {
+            document.getElementById('deviceTypeModalTitle').innerText = "Edit Item";
+            document.getElementById('formMethod').value = "PUT";
+            document.getElementById('itemPk').value = pk;
+            document.querySelector('input[name="name"]').value = name;
+            document.querySelector('input[name="description"]').value = description;
+            document.querySelector('input[name="image"]').value = image;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const url = document.getElementById('formMethod').value === 'POST' 
+                ? '/backoffice/devices_type/' 
+                : `/backoffice/devices_type/${document.getElementById('itemPk').value}/`;
+            const method = document.getElementById('formMethod').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(document.getElementById('deviceForm'));
+            const payload = Object.fromEntries(formData.entries());
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item saved successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to save item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function deleteDeviceType(pk) {
+            const url = `/backoffice/devices_type/${pk}/`;  // URL para a ação DELETE
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,  // Envia o token CSRF para segurança
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAllDevices() {
+            fetch('/backoffice/devices_type/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('All Devices:', data.items);
+                })
+                .catch(error => console.error('Error fetching devices:', error));
+        }
+
+        function fetchDeviceById(pk) {
+            fetch(`/backoffice/devices_type/${pk}/`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Device not found');
+                })
+                .then(data => {
+                    console.log('Device:', data);
+                })
+                .catch(error => console.error('Error fetching device:', error));
+        }
+
+    </script>
+        
+{% endblock %}

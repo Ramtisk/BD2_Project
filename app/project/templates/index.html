@@ -1,0 +1,139 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  {% load bootstrap5 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.0.0/css/tempus-dominus.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tempus-dominus/6.0.0/js/tempus-dominus.min.js"></script>
+
+</head>
+<body>
+  <div class="d-flex w-full" style="min-height: 100vh;width: 100%;">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-dark bg-snow" style="width: 280px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);">
+      <a href="/backoffice" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+        <img src="{% static 'images/logo.png' %}" alt="" width="160" height="60" >
+      </a>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+          <a href="/backoffice" class="nav-link text-dark" aria-current="page">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/devices_type" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+            Devices Type
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/address" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+            Address
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/device" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+            Device
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/discount" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Discount
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/payment" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Payment
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/plan" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Plan
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/plan_subscription" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Plan Subscription
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/subcription_visit" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Subcription Visit
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/subcription" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Subcription
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/tecnical_visit" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Tecnical Visit
+          </a>
+        </li>
+        <li>
+          <a href="/backoffice/plan_device" class="nav-link text-dark">
+            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+            Plan Device
+          </a>
+        </li>
+      </ul>
+      <hr>
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="{% static 'images/icon.jpg' %}" alt="" width="32" height="32" class="rounded-circle me-2">
+          <strong>Pedro</strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+          <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+        </ul>
+      </div>
+    </div> 
+    <div style="min-height: 100vh;width: 100%;">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      new tempusDominus.TempusDominus(document.querySelector('.datetimepicker'), {
+        display: {
+          components: {
+            calendar: true,
+            date: true,
+            month: true,
+            year: true,
+            decades: true,
+            clock: true,
+            hours: true,
+            minutes: true,
+            seconds: false
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

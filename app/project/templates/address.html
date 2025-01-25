@@ -1,0 +1,188 @@
+{% extends "index.html" %}
+
+{% block content%}
+    <div class="p-4">
+        <h1>Address</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#addressModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Address
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">street</th>
+                    <th scope="col">city</th>
+                    <th scope="col">postal_code</th>
+                    <th scope="col">country</th>
+                    <th scope="col">user</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.street }}</td>
+                    <td>{{ item.city }}</td>
+                    <td>{{ item.postal_code }}</td>
+                    <td>{{ item.country }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#addressModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.street}}','{{item.city}}','{{item.postal_code}}','{{item.country}}','{{item.user}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    
+        <!-- Modal -->
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="addressModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addressForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+
+
+
+    <script>
+        function openCreateModal() {
+            document.getElementById('addressForm').reset();
+            document.getElementById('addressModalTitle').innerText = "Create Item";
+            document.getElementById('formMethod').value = "POST";
+
+            document.getElementById('itemPk').value = "";
+            document.querySelector('input[name="street"]').value = "";
+            document.querySelector('input[name="city"]').value = "";
+            document.querySelector('input[name="postal_code"]').value = "";
+            document.querySelector('input[name="country"]').value = "";
+            document.querySelector('input[name="user"]').value = "";
+        }
+        
+        function openEditModal(pk,street,city,postal_code,country,user) {
+            document.getElementById('addressModalTitle').innerText = "Edit Item";
+            document.getElementById('formMethod').value = "PUT";
+            document.getElementById('itemPk').value = pk;
+            document.querySelector('input[name="street"]').value = street;
+            document.querySelector('input[name="city"]').value = city;
+            document.querySelector('input[name="postal_code"]').value = postal_code;
+            document.querySelector('input[name="country"]').value = country;
+            document.querySelector('input[name="user"]').value = user;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const url = document.getElementById('formMethod').value === 'POST' 
+                ? '/backoffice/address/' 
+                : `/backoffice/address/${document.getElementById('itemPk').value}/`;
+            const method = document.getElementById('formMethod').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(document.getElementById('addressForm'));
+            const payload = Object.fromEntries(formData.entries());
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item saved successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to save item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function deleteRequest(pk) {
+            const url = `/backoffice/address/${pk}/`;  // URL para a ação DELETE
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,  // Envia o token CSRF para segurança
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAlladdress() {
+            fetch('/backoffice/address/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('All address:', data.items);
+                })
+                .catch(error => console.error('Error fetching address:', error));
+        }
+
+        function fetchaddressById(pk) {
+            fetch(`/backoffice/address/${pk}/`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('address not found');
+                })
+                .then(data => {
+                    console.log('address:', data);
+                })
+                .catch(error => console.error('Error fetching address:', error));
+        }
+
+    </script>
+        
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "index.html" %}
+
+{% block content%}
+    <div class="p-4">
+        <h1>Payment</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#PaymentModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Payment
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">subscription</th>
+                    <th scope="col">user</th>
+                    <th scope="col">amount</th>
+                    <th scope="col">date</th>
+                    <th scope="col">entity</th>
+                    <th scope="col">refence</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.subscription }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.entity }}</td>
+                    <td>{{ item.refence }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#PaymentModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.subscription}}','{{item.user}}','{{item.amount}}','{{item.date}}','{{item.entity}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="PaymentModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="PaymentModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="PaymentForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+
+
+    <script>
+        function openCreateModal() {
+            document.getElementById('PaymentForm').reset();
+            document.getElementById('PaymentModalTitle').innerText = "Create Item";
+            document.getElementById('formMethod').value = "POST";
+
+            document.getElementById('itemPk').value = "";
+            document.querySelector('input[name="subscription"]').value = "";
+            document.querySelector('input[name="user"]').value = "";
+            document.querySelector('input[name="amount"]').value = "";
+            document.querySelector('input[name="date"]').value = "";
+            document.querySelector('input[name="entity"]').value = "";
+            document.querySelector('input[name="refence"]').value = "";
+        }
+        
+        function openEditModal(pk,subscription,user,amount,date,entity,refence) {
+            document.getElementById('PaymentModalTitle').innerText = "Edit Item";
+            document.getElementById('formMethod').value = "PUT";
+
+            document.getElementById('itemPk').value = pk;
+            document.querySelector('input[name="subscription"]').value = subscription;
+            document.querySelector('input[name="user"]').value = user;
+            document.querySelector('input[name="amount"]').value = amount;
+            document.querySelector('input[name="date"]').value = date;
+            document.querySelector('input[name="entity"]').value = entity;
+            document.querySelector('input[name="refence"]').value = refence;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();  // Impede o envio padrão do formulário
+
+            const url = document.getElementById('formMethod').value === 'POST' 
+                ? '/backoffice/payment/' 
+                : `/backoffice/payment/${document.getElementById('itemPk').value}/`;
+            const method = document.getElementById('formMethod').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const formData = new FormData(document.getElementById('PaymentForm'));
+            const payload = Object.fromEntries(formData.entries());
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item saved successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to save item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+        function deleteRequest(pk) {
+            const url = `/backoffice/payment/${pk}/`;  // URL para a ação DELETE
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken,  // Envia o token CSRF para segurança
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Item deleted successfully.');
+                        location.reload();  // Recarrega a página para atualizar a lista
+                    } else {
+                        alert('Failed to delete item.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAllPayment() {
+            fetch('/backoffice/payment/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('All Payment:', data.items);
+                })
+                .catch(error => console.error('Error fetching Payment:', error));
+        }
+
+        function fetchPaymentById(pk) {
+            fetch(`/backoffice/payment/${pk}/`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Payment not found');
+                })
+                .then(data => {
+                    console.log('Payment:', data);
+                })
+                .catch(error => console.error('Error fetching Payment:', error));
+        }
+
+    </script>
+        
+{% endblock %}
