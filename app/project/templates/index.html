@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,9 +17,9 @@
 <body>
   <div class="d-flex w-full" style="min-height: 100vh;width: 100%;">
     <div class="d-flex flex-column flex-shrink-0 p-3 text-dark bg-snow" style="width: 280px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+      <a href="/backoffice" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
         <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-        <span class="fs-4">Sidebar</span>
+        <img src="{% static 'images/logo.png' %}" alt="" width="160" height="60" >
       </a>
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
@@ -97,8 +99,8 @@
       <hr>
       <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-          <strong>mdo</strong>
+          <img src="{% static 'images/icon.jpg' %}" alt="" width="32" height="32" class="rounded-circle me-2">
+          <strong>Pedro</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
           <li><a class="dropdown-item" href="/logout">Sign out</a></li>
