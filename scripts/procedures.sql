@@ -53,3 +53,42 @@ BEGIN
     RETURN (SELECT COUNT(*) FROM auth_user where is_staff=false and is_superuser=false and is_active=true);
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE generate_payment()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    rec RECORD; -- Variável para armazenar cada linha do resultado da query
+    total_amount FLOAT; -- Variável para armazenar o valor total com descontos
+    new_end_date TIMESTAMP; -- Variável para o novo end_date
+    random_entity TEXT; -- Variável para armazenar uma entidade aleatória
+    random_reference TEXT; -- Variável para armazenar uma referência aleatória
+BEGIN
+    FOR rec IN
+        SELECT 
+            s.subscription_id,
+            s.user_id,
+            SUM(p.price * (1 - COALESCE(d.percent, 0) / 100.0)) AS total_amount -- Aplica o desconto
+        FROM Subscription s
+        JOIN plan_subscription ps ON s.subscription_id = ps.subscription_id
+        JOIN Plan p ON ps.plan_id = p.plan_id
+        LEFT JOIN Discount d ON s.discount_id = d.discount_id
+        WHERE s.end_date >= NOW()
+        GROUP BY s.subscription_id, s.user_id
+    LOOP
+        total_amount := rec.total_amount;
+
+        new_end_date := DATE_TRUNC('month', NOW()) + INTERVAL '1 month';
+
+        random_entity := TRUNC(RANDOM() * 1000)::TEXT;
+        random_reference := MD5(RANDOM()::TEXT);
+
+        INSERT INTO Payment (subscription_id, user_id, amount, date, entity, refence)
+        VALUES (rec.subscription_id, rec.user_id, total_amount, NOW(), random_entity, random_reference);
+
+        UPDATE Subscription
+        SET end_date = new_end_date
+        WHERE subscription_id = rec.subscription_id;
+    END LOOP;
+END;
+$$;
