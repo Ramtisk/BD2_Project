@@ -1,0 +1,12 @@
+<h1>Gerenciar Tipos de Dispositivo</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adicionar Tipo de Dispositivo</button>
+</form>
+<h2>Lista de Tipos de Dispositivo</h2>
+<ul>
+    {% for device_type in devices_types %}
+        <li>{{ device_type.name }} - {{ device_type.description }}</li>
+    {% endfor %}
+</ul>

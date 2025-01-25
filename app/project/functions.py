@@ -76,7 +76,7 @@ def get_visitas_tecnicas():
             'id': row[0],
             'descricao': row[1],  # Ajuste conforme as colunas da tabela `tecnical_visit`
             'data': row[2],
-            'local': row[3],      # Exemplo: 'local' deve ser substituído pela coluna real
+            'device_id': row[3],      
         }
         for row in rows
     ]

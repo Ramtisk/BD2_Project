@@ -21,18 +21,23 @@ def login_view(request):
         if user is not None:
             login(request, user)
             
-            # Salvar o tipo de utilizador na sessão
+            # Determinar o grupo do utilizador
             if user.is_superuser:
                 request.session['user_group'] = 'admin'
             elif user.groups.filter(name='cliente').exists():
                 request.session['user_group'] = 'cliente'
+            elif user.groups.filter(name='fornecedor').exists():
+                request.session['user_group'] = 'fornecedor'
             else:
                 request.session['user_group'] = 'unknown'
 
+            # Redirecionar com base no grupo do utilizador
             if request.session['user_group'] == 'admin':
-                return redirect('adminHome')
+                return redirect('adminHome')  # Página do admin
             elif request.session['user_group'] == 'cliente':
-                return redirect('clientHome')
+                return redirect('clientHome')  # Página do cliente
+            elif request.session['user_group'] == 'fornecedor':
+                return redirect('fornecedor_home')  # Página do fornecedor
             else:
                 messages.error(request, "Sem permissões específicas configuradas.")
                 logout(request)

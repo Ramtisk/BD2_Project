@@ -47,4 +47,13 @@ def ClientSignView(request, id):
         )
         return redirect('clientHome');
 
+    elif request.method == 'PUT':
+        subscription = Subscription.objects.filter(user=user, plansubscription__plan=plan).first()
+
+        if subscription:
+            subscription.end_date = now()
+            subscription.save()
+
+        return redirect('clientHome')
+
     return JsonResponse({'error': 'Método não permitido'}, status=405)

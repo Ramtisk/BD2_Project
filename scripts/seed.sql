@@ -7,13 +7,15 @@ DELETE FROM auth_group;
 INSERT INTO auth_group (name)
 VALUES
 ('admin'),
-('client');
+('client'),
+('fornecedor');
 
 -- Ajustando as associações de usuários aos novos grupos
 INSERT INTO auth_user_groups (user_id, group_id)
 VALUES
 (2, 1), -- João Silva como 'admin'
 (3, 2); -- Maria Oliveira como 'client'
+(4,3)
 
 -- Ajustando permissões para os novos grupos
 INSERT INTO auth_group_permissions (group_id, permission_id)
@@ -26,8 +28,8 @@ INSERT INTO auth_user (password, last_login, is_superuser, username, first_name,
 VALUES
 ('password1', NULL, TRUE, 'joao_silva', 'João', 'Silva', 'joao.silva@example.com', TRUE, TRUE, NOW()),
 ('password2', NULL, FALSE, 'maria_oliveira', 'Maria', 'Oliveira', 'maria.oliveira@example.com', FALSE, TRUE, NOW()),
-('password3', NULL, FALSE, 'antonio_santos', 'António', 'Santos', 'antonio.santos@example.com', FALSE, TRUE, NOW());
-
+('password3', NULL, FALSE, 'antonio_santos', 'António', 'Santos', 'antonio.santos@example.com', FALSE, TRUE, NOW()),
+('password4', NULL, FALSE, 'Paulinho', 'Paulo', 'Andrade', 'PAndrade@example.com', FALSE, TRUE, NOW());
 -- Inserindo dados na tabela auth_permission
 INSERT INTO auth_permission (name, content_type_id, codename)
 VALUES
