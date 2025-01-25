@@ -1,31 +1,17 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+
+def logout_view(request):
+    logout(request)
+    response = redirect('login')
+    print(f"Antes de deletar: {request.COOKIES}")
+    response.delete_cookie('sessionid', domain=None, path='/')
+    print(f"Depois de deletar: {response.cookies}")
+    return response
+
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            # Redirecionar com base no papel do usuário
-            if user.is_superuser:
-                return redirect('/backoffice')  # Página do administrador
-            elif user.groups.filter(name='cliente').exists():
-                return redirect('/client')  # Página do cliente/fornecedor
-            else:
-                messages.error(request, "Sem permissões específicas configuradas para este usuário.")
-                return redirect('login')
-        else:
-            messages.error(request, "Credenciais inválidas. Tente novamente.")
-            return redirect('login')
-    
-    return render(request, 'login.html')
-#
-# def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -34,31 +20,25 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            # Persistir dados na sessão
-            request.session['username'] = username
-            request.session['is_superuser'] = user.is_superuser
-            request.session['user_groups'] = list(user.groups.values_list('name', flat=True))
             
-            # Redirecionar com base no papel do usuário
+            # Salvar o tipo de utilizador na sessão
             if user.is_superuser:
-                return redirect('/backoffice')  # Página do administrador
-            elif 'cliente' in request.session['user_groups']:
-                return redirect('/client')  # Página do cliente/fornecedor
+                request.session['user_group'] = 'admin'
+            elif user.groups.filter(name='cliente').exists():
+                request.session['user_group'] = 'cliente'
             else:
-                messages.error(request, "Sem permissões específicas configuradas para este usuário.")
+                request.session['user_group'] = 'unknown'
+
+            if request.session['user_group'] == 'admin':
+                return redirect('adminHome')
+            elif request.session['user_group'] == 'cliente':
+                return redirect('clientHome')
+            else:
+                messages.error(request, "Sem permissões específicas configuradas.")
+                logout(request)
                 return redirect('login')
         else:
             messages.error(request, "Credenciais inválidas. Tente novamente.")
             return redirect('login')
     
     return render(request, 'login.html')
-
-def client_home(request):
-    if 'username' not in request.session or 'cliente' not in request.session.get('user_groups', []):
-        messages.error(request, "Acesso negado. Faça login.")
-        return redirect('login')
-    
-    username = request.session['username']
-    return render(request, 'client_home.html', {'username': username})
-
-#

@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponseBadRequest
 from .models import AppLogs, PlanDevice, DevicesType, Address, Device, Discount, Payment, Plan, PlanSubscription, SubcriptionVisit, Subscription, TecnicalVisit
@@ -21,6 +22,10 @@ def log_action(action_type, table, action, description):
     )
 
 def HomeView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
+
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormAddress(data)
@@ -76,6 +81,9 @@ def HomeView(request, pk=None):
 
 
 def AddressView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormAddress(data)
@@ -118,6 +126,9 @@ def AddressView(request, pk=None):
 
 # Mesma abordagem aplicada nas demais views
 def DevicesTypeView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormDevicesType(data)
@@ -159,6 +170,9 @@ def DevicesTypeView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def DeviceView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormDevice(data)
@@ -200,6 +214,9 @@ def DeviceView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def DiscountView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormDiscount(data)
@@ -241,6 +258,9 @@ def DiscountView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def PlanView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormPlan(data)
@@ -282,6 +302,9 @@ def PlanView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def SubcriptionView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormSubscription(data)
@@ -323,6 +346,9 @@ def SubcriptionView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def PaymentView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormPayment(data)
@@ -364,6 +390,9 @@ def PaymentView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def TecnicalVisitView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormTecnicalVisit(data)
@@ -405,6 +434,9 @@ def TecnicalVisitView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def SubcriptionVisitView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormSubcriptionVisit(data)
@@ -446,6 +478,9 @@ def SubcriptionVisitView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def PlanDeviceView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormPlanDevice(data)
@@ -487,6 +522,9 @@ def PlanDeviceView(request, pk=None):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def PlanSubscriptionView(request, pk=None):
+    if request.session.get('user_group') != 'admin':
+        messages.error(request, "Acesso negado.")
+        return redirect('login')
     if request.method == 'POST':
         data = json.loads(request.body)
         form = ItemFormPlanSubscription(data)

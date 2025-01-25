@@ -29,8 +29,9 @@ INSTALLED_APPS = [
     'bootstrap5',
     'app',
     'project',
+    'client',
     'authentication',
-    'client'
+    'fornecedor'
 ]
 
 MIDDLEWARE = [
