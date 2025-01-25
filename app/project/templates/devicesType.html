@@ -1,72 +1,74 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Devices Types</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#deviceTypeModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Device Type
-    </button>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Image</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.name }}</td>
-                <td>{{ item.description }}</td>
-                <td>{{ item.image }}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#deviceTypeModal" onclick="openEditModal('{{ item.pk }}', '{{ item.name }}', '{{ item.description }}', '{{ item.image }}')">
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteDeviceType({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="p-4">
+        <h1>Devices Types</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#deviceTypeModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Device Type
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Image</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.image }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#deviceTypeModal" onclick="openEditModal('{{ item.pk }}', '{{ item.name }}', '{{ item.description }}', '{{ item.image }}')">
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteDeviceType({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="deviceTypeModal" tabindex="-1" role="dialog" aria-labelledby="deviceTypeModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="deviceTypeModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="deviceForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemPk" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="deviceTypeModal" tabindex="-1" role="dialog" aria-labelledby="deviceTypeModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="deviceTypeModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deviceForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>    
+        </div>    
+    </div>
 
 
     <script>
@@ -93,8 +95,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/devices_type/' 
-                : `/v1/devices_type/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/devices_type/' 
+                : `/backoffice/devices_type/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -121,7 +123,7 @@
         }
 
         function deleteDeviceType(pk) {
-            const url = `/v1/devices_type/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/devices_type/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -143,7 +145,7 @@
         }
 
         function fetchAllDevices() {
-            fetch('/v1/devices_type/')
+            fetch('/backoffice/devices_type/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All Devices:', data.items);
@@ -152,7 +154,7 @@
         }
 
         function fetchDeviceById(pk) {
-            fetch(`/v1/devices_type/${pk}/`)
+            fetch(`/backoffice/devices_type/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

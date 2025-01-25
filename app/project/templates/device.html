@@ -1,79 +1,80 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Device</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#deviceModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add device
-    </button>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">device type</th>
-                <th scope="col">installation date</th>
-                <th scope="col">serial_number</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.device_type }}</td>
-                <td>{{ item.installation_date }}</td>
-                <td>{{ item.serial_number }}</td>
-                <td>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        data-toggle="modal" 
-                        data-target="#deviceModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.device_type}}','{{item.installation_date}}','{{item.serial_number}}')"
-                    >
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="p-4">
+        <h1>Device</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#deviceModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add device
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">device type</th>
+                    <th scope="col">installation date</th>
+                    <th scope="col">serial_number</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.device_type }}</td>
+                    <td>{{ item.installation_date }}</td>
+                    <td>{{ item.serial_number }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#deviceModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.device_type}}','{{item.installation_date}}','{{item.serial_number}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="deviceModal" tabindex="-1" role="dialog" aria-labelledby="deviceModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="deviceModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="deviceForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemPk" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="deviceModal" tabindex="-1" role="dialog" aria-labelledby="deviceModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="deviceModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="deviceForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>    
-
+        </div>    
+    </div>
 
     <script>
         function openCreateModal() {
@@ -101,8 +102,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/device/' 
-                : `/v1/device/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/device/' 
+                : `/backoffice/device/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -130,7 +131,7 @@
 
 
         function deleteRequest(pk) {
-            const url = `/v1/device/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/device/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -152,7 +153,7 @@
         }
 
         function fetchAllDevice() {
-            fetch('/v1/device/')
+            fetch('/backoffice/device/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All device:', data.items);
@@ -161,7 +162,7 @@
         }
 
         function fetchDeviceById(pk) {
-            fetch(`/v1/device/${pk}/`)
+            fetch(`/backoffice/device/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

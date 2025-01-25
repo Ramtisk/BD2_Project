@@ -63,7 +63,7 @@ class Plan(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     price = models.FloatField(validators=[MinValueValidator(0.01)])
-        
+    image = models.TextField(blank=True, null=True)   
     SERVICE_TYPE_CHOICES = [
         ('Telemovel', 'Telemovel'),
         ('Internet', 'Internet'),

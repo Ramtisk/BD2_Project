@@ -14,81 +14,81 @@
 </head>
 <body>
   <div class="d-flex w-full" style="min-height: 100vh;width: 100%;">
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <div class="d-flex flex-column flex-shrink-0 p-3 text-dark bg-snow" style="width: 280px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
         <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
         <span class="fs-4">Sidebar</span>
       </a>
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-          <a href="#" class="nav-link text-white" aria-current="page">
+          <a href="/backoffice" class="nav-link text-dark" aria-current="page">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
             Home
           </a>
         </li>
         <li>
-          <a href="/v1/devices_type" class="nav-link text-white">
+          <a href="/backoffice/devices_type" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
             Devices Type
           </a>
         </li>
         <li>
-          <a href="/v1/address" class="nav-link text-white">
+          <a href="/backoffice/address" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
             Address
           </a>
         </li>
         <li>
-          <a href="/v1/device" class="nav-link text-white">
+          <a href="/backoffice/device" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
             Device
           </a>
         </li>
         <li>
-          <a href="/v1/discount" class="nav-link text-white">
+          <a href="/backoffice/discount" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Discount
           </a>
         </li>
         <li>
-          <a href="/v1/payment" class="nav-link text-white">
+          <a href="/backoffice/payment" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Payment
           </a>
         </li>
         <li>
-          <a href="/v1/plan" class="nav-link text-white">
+          <a href="/backoffice/plan" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Plan
           </a>
         </li>
         <li>
-          <a href="/v1/plan_subscription" class="nav-link text-white">
+          <a href="/backoffice/plan_subscription" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Plan Subscription
           </a>
         </li>
         <li>
-          <a href="/v1/subcription_visit" class="nav-link text-white">
+          <a href="/backoffice/subcription_visit" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Subcription Visit
           </a>
         </li>
         <li>
-          <a href="/v1/subcription" class="nav-link text-white">
+          <a href="/backoffice/subcription" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Subcription
           </a>
         </li>
         <li>
-          <a href="/v1/tecnical_visit" class="nav-link text-white">
+          <a href="/backoffice/tecnical_visit" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Tecnical Visit
           </a>
         </li>
         <li>
-          <a href="/v1/plan_device" class="nav-link text-white">
+          <a href="/backoffice/plan_device" class="nav-link text-dark">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
             Plan Device
           </a>
@@ -96,7 +96,7 @@
       </ul>
       <hr>
       <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
           <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
           <strong>mdo</strong>
         </a>
@@ -109,7 +109,7 @@
         </ul>
       </div>
     </div> 
-    <div class="p-4" style="min-height: 100vh;width: 100%;">
+    <div style="min-height: 100vh;width: 100%;">
       {% block content %}
       {% endblock %}
     </div>

@@ -69,13 +69,8 @@ class ItemFormDiscount(forms.ModelForm):
 class ItemFormPlan(forms.ModelForm):
     class Meta:
         model = Plan
-        fields = ['name','description', 'price', 'service_type','image']
+        fields = ['name','description', 'price', 'service_type']
 
-    image = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'rows': 3,
-        'id': 'imageFormControlTextInput'
-    }))
     name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'rows': 3,

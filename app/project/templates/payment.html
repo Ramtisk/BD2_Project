@@ -1,84 +1,86 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Payment</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#PaymentModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Payment
-    </button>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">subscription</th>
-                <th scope="col">user</th>
-                <th scope="col">amount</th>
-                <th scope="col">date</th>
-                <th scope="col">entity</th>
-                <th scope="col">refence</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.subscription }}</td>
-                <td>{{ item.user }}</td>
-                <td>{{ item.amount }}</td>
-                <td>{{ item.date }}</td>
-                <td>{{ item.entity }}</td>
-                <td>{{ item.refence }}</td>
-                <td>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        data-toggle="modal" 
-                        data-target="#PaymentModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.subscription}}','{{item.user}}','{{item.amount}}','{{item.date}}','{{item.entity}}')"
-                    >
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="p-4">
+        <h1>Payment</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#PaymentModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Payment
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">subscription</th>
+                    <th scope="col">user</th>
+                    <th scope="col">amount</th>
+                    <th scope="col">date</th>
+                    <th scope="col">entity</th>
+                    <th scope="col">refence</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.subscription }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>{{ item.amount }}</td>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.entity }}</td>
+                    <td>{{ item.refence }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#PaymentModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.subscription}}','{{item.user}}','{{item.amount}}','{{item.date}}','{{item.entity}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="PaymentModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="PaymentModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="PaymentForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemPk" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog" aria-labelledby="PaymentModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="PaymentModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="PaymentForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>    
+        </div>    
+    </div>
 
 
     <script>
@@ -113,8 +115,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/payment/' 
-                : `/v1/payment/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/payment/' 
+                : `/backoffice/payment/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -142,7 +144,7 @@
 
 
         function deleteRequest(pk) {
-            const url = `/v1/payment/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/payment/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -164,7 +166,7 @@
         }
 
         function fetchAllPayment() {
-            fetch('/v1/payment/')
+            fetch('/backoffice/payment/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All Payment:', data.items);
@@ -173,7 +175,7 @@
         }
 
         function fetchPaymentById(pk) {
-            fetch(`/v1/payment/${pk}/`)
+            fetch(`/backoffice/payment/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

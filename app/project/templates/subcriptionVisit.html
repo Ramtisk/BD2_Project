@@ -1,76 +1,78 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Subcription Visit</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#SubcriptionVisitModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Subcription Visit
-    </button>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">subscription</th>
-                <th scope="col">tecnical_visit</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.subscription }}</th>
-                <td>{{ item.tecnical_visit }}</td>
-                <td>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        data-toggle="modal" 
-                        data-target="#SubcriptionVisitModal" 
-                        onclick="openEditModal('{{item.subscription}}','{{item.tecnical_visit}}')"
-                    >
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="p-4">
+        <h1>Subcription Visit</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#SubcriptionVisitModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Subcription Visit
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">subscription</th>
+                    <th scope="col">tecnical_visit</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.subscription }}</th>
+                    <td>{{ item.tecnical_visit }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#SubcriptionVisitModal" 
+                            onclick="openEditModal('{{item.subscription}}','{{item.tecnical_visit}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="SubcriptionVisitModal" tabindex="-1" role="dialog" aria-labelledby="SubcriptionVisitModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="SubcriptionVisitModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="SubcriptionVisitForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemsubscription" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="SubcriptionVisitModal" tabindex="-1" role="dialog" aria-labelledby="SubcriptionVisitModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="SubcriptionVisitModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="SubcriptionVisitForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemsubscription" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>    
+        </div>    
+    </div>
 
 
     <script>
@@ -96,8 +98,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/subcription_visit/' 
-                : `/v1/subcription_visit/${document.getElementById('itemsubscription').value}/`;
+                ? '/backoffice/subcription_visit/' 
+                : `/backoffice/subcription_visit/${document.getElementById('itemsubscription').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -125,7 +127,7 @@
 
 
         function deleteRequest(subscription) {
-            const url = `/v1/subcription_visit/${subscription}/`;  // URL para a ação DELETE
+            const url = `/backoffice/subcription_visit/${subscription}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -147,7 +149,7 @@
         }
 
         function fetchAllSubcriptionVisit() {
-            fetch('/v1/subcription_visit/')
+            fetch('/backoffice/subcription_visit/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All SubcriptionVisit:', data.items);
@@ -156,7 +158,7 @@
         }
 
         function fetchSubcriptionVisitById(subscription) {
-            fetch(`/v1/subcription_visit/${subscription}/`)
+            fetch(`/backoffice/subcription_visit/${subscription}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

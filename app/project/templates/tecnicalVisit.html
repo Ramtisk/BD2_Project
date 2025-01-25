@@ -1,6 +1,7 @@
 {% extends "index.html" %}
 
 {% block content%}
+<div class="p-4">
     <h1>Tecnical Visit</h1>
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#TecnicalVisitModal" onclick="openCreateModal()">
@@ -73,6 +74,7 @@
             </div>
         </div>
     </div>    
+</div>
 
 
     <script>
@@ -101,8 +103,8 @@
             event.preventDefault();  /// Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/tecnical_visit/' 
-                : `/v1/tecnical_visit/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/tecnical_visit/' 
+                : `/backoffice/tecnical_visit/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -130,7 +132,7 @@
 
 
         function deleteRequest(pk) {
-            const url = `/v1/tecnical_visit/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/tecnical_visit/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -152,7 +154,7 @@
         }
 
         function fetchAllTecnicalVisit() {
-            fetch('/v1/tecnical_visit/')
+            fetch('/backoffice/tecnical_visit/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All TecnicalVisit:', data.items);
@@ -161,7 +163,7 @@
         }
 
         function fetchTecnicalVisitById(pk) {
-            fetch(`/v1/tecnical_visit/${pk}/`)
+            fetch(`/backoffice/tecnical_visit/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

@@ -31,3 +31,25 @@ BEGIN
     WHERE subscription_id = subscription_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION get_clientes_mes_atual()
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN (
+        SELECT COUNT(*) 
+        FROM auth_user 
+        WHERE DATE_PART('year', date_joined) = DATE_PART('year', CURRENT_DATE)
+          AND DATE_PART('month', date_joined) = DATE_PART('month', CURRENT_DATE)
+		  AND is_staff=false 
+		  AND is_superuser=false
+		  AND is_active=true
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION contar_clientes()
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN (SELECT COUNT(*) FROM auth_user where is_staff=false and is_superuser=false and is_active=true);
+END;
+$$ LANGUAGE plpgsql;

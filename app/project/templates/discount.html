@@ -1,76 +1,79 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Discount</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#discountModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Discount
-    </button>
-    
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">percent</th>
-                <th scope="col">active</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.percent }}</td>
-                <td>{{ item.active }}</td>
-                <td>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        data-toggle="modal" 
-                        data-target="#discountModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.percent}}','{{item.active}}')"
-                    >
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="p-4">
+        <h1>Discount</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#discountModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Discount
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">percent</th>
+                    <th scope="col">active</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.percent }}</td>
+                    <td>{{ item.active }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#discountModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.percent}}','{{item.active}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="discountModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="discountModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="discountForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemPk" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="discountModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="discountModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="discountForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
+
 
 
     <script>
@@ -97,8 +100,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/discount/' 
-                : `/v1/discount/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/discount/' 
+                : `/backoffice/discount/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -126,7 +129,7 @@
 
 
         function deleteRequest(pk) {
-            const url = `/v1/discount/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/discount/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -148,7 +151,7 @@
         }
 
         function fetchAlldiscount() {
-            fetch('/v1/discount/')
+            fetch('/backoffice/discount/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All discount:', data.items);
@@ -157,7 +160,7 @@
         }
 
         function fetchdiscountById(pk) {
-            fetch(`/v1/discount/${pk}/`)
+            fetch(`/backoffice/discount/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

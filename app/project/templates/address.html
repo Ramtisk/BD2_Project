@@ -1,82 +1,85 @@
 {% extends "index.html" %}
 
 {% block content%}
-    <h1>Address</h1>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#addressModal" onclick="openCreateModal()">
-        <i class="fa fa-plus"></i> Add Address
-    </button>
+    <div class="p-4">
+        <h1>Address</h1>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#addressModal" onclick="openCreateModal()">
+            <i class="fa fa-plus"></i> Add Address
+        </button>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">street</th>
+                    <th scope="col">city</th>
+                    <th scope="col">postal_code</th>
+                    <th scope="col">country</th>
+                    <th scope="col">user</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ item.pk }}</th>
+                    <td>{{ item.street }}</td>
+                    <td>{{ item.city }}</td>
+                    <td>{{ item.postal_code }}</td>
+                    <td>{{ item.country }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>
+                        <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-secondary" 
+                            data-toggle="modal" 
+                            data-target="#addressModal" 
+                            onclick="openEditModal('{{item.pk}}','{{item.street}}','{{item.city}}','{{item.postal_code}}','{{item.country}}','{{item.user}}')"
+                        >
+                            Edit
+                        </button>
+                    </td>                
+                    <td>
+                        <button 
+                            class="btn btn-sm btn-outline-danger" 
+                            onclick="deleteRequest({{ item.pk }})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">street</th>
-                <th scope="col">city</th>
-                <th scope="col">postal_code</th>
-                <th scope="col">country</th>
-                <th scope="col">user</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for item in items %}
-            <tr>
-                <th scope="row">{{ item.pk }}</th>
-                <td>{{ item.street }}</td>
-                <td>{{ item.city }}</td>
-                <td>{{ item.postal_code }}</td>
-                <td>{{ item.country }}</td>
-                <td>{{ item.user }}</td>
-                <td>
-                    <button 
-                        type="button" 
-                        class="btn btn-sm btn-outline-secondary" 
-                        data-toggle="modal" 
-                        data-target="#addressModal" 
-                        onclick="openEditModal('{{item.pk}}','{{item.street}}','{{item.city}}','{{item.postal_code}}','{{item.country}}','{{item.user}}')"
-                    >
-                        Edit
-                    </button>
-                </td>                
-                <td>
-                    <button 
-                        class="btn btn-sm btn-outline-danger" 
-                        onclick="deleteRequest({{ item.pk }})">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Modal -->
-    <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title" id="addressModalTitle">Create Item</h1>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="addressForm" onsubmit="handleSubmit(event)">
-                        {% csrf_token %}
-                        <input type="hidden" id="formMethod" value="POST">
-                        <input type="hidden" id="itemPk" value="">
-                        {{ form.as_p }}
-                        <div class="d-flex mt-4">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>                    
+        <!-- Modal -->
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="addressModalTitle">Create Item</h1>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addressForm" onsubmit="handleSubmit(event)">
+                            {% csrf_token %}
+                            <input type="hidden" id="formMethod" value="POST">
+                            <input type="hidden" id="itemPk" value="">
+                            {{ form.as_p }}
+                            <div class="d-flex mt-4">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </form>                    
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>    
+        </div>    
+    </div>
+
 
 
     <script>
@@ -108,8 +111,8 @@
             event.preventDefault();  // Impede o envio padrão do formulário
 
             const url = document.getElementById('formMethod').value === 'POST' 
-                ? '/v1/address/' 
-                : `/v1/address/${document.getElementById('itemPk').value}/`;
+                ? '/backoffice/address/' 
+                : `/backoffice/address/${document.getElementById('itemPk').value}/`;
             const method = document.getElementById('formMethod').value;
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -136,7 +139,7 @@
         }
 
         function deleteRequest(pk) {
-            const url = `/v1/address/${pk}/`;  // URL para a ação DELETE
+            const url = `/backoffice/address/${pk}/`;  // URL para a ação DELETE
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch(url, {
@@ -158,7 +161,7 @@
         }
 
         function fetchAlladdress() {
-            fetch('/v1/address/')
+            fetch('/backoffice/address/')
                 .then(response => response.json())
                 .then(data => {
                     console.log('All address:', data.items);
@@ -167,7 +170,7 @@
         }
 
         function fetchaddressById(pk) {
-            fetch(`/v1/address/${pk}/`)
+            fetch(`/backoffice/address/${pk}/`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();

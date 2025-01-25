@@ -100,6 +100,7 @@ CREATE TABLE Plan (
     plan_id SERIAL PRIMARY KEY,
     name TEXT,
     description TEXT,
+    image TEXT
     price FLOAT CHECK (price >= 0.01),
     service_type VARCHAR(10) CHECK (service_type IN ('Telemovel', 'Internet', 'TV', 'Telefone'))
 );
