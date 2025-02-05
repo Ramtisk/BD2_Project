@@ -1,14 +1,19 @@
-# init.sh
+#!/bin/bash
 set -e
+
+echo "Iniciando script de inicialização do MongoDB..."
 
 mongosh <<EOF
 use admin
 db.createUser({
-  user: '$MONGODB_USER',
-  pwd:  '$MONGODB_PASSWORD',
-  roles: [{
-    role: 'readWrite',
-    db: '$MONGODB_DB'
-  }]
-})
+  user: "admin",
+  pwd: "admin",
+  roles: [
+    { role: "root", db: "admin" },
+    { role: "readWrite", db: "bd2_mongodb" }
+  ]
+});
+print("Usuário criado com sucesso!");
 EOF
+
+echo "Script de inicialização do MongoDB concluído."

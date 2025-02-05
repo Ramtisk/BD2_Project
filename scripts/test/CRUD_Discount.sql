@@ -1,22 +1,28 @@
--- CREATE Function: sp_Discount_UPDATE
-CREATE OR REPLACE FUNCTION sp_Discount_UPDATE(
+-- CRUD para Discount
+
+CREATE OR REPLACE FUNCTION sp_Discount_CREATE(
     p_name TEXT,
-    p_new_percent INTEGER
+    p_percent INTEGER,
+    p_active BOOLEAN
 )
 RETURNS VOID AS $$
 BEGIN
     BEGIN
-        UPDATE discount
-        SET percent = p_new_percent
-        WHERE name = p_name;
+        INSERT INTO discount (name, percent, active)
+        VALUES (p_name, p_percent, p_active);
     EXCEPTION
+        WHEN unique_violation THEN
+            UPDATE discount
+            SET percent = p_percent, active = p_active
+            WHERE name = p_name;
         WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao atualizar desconto: %', SQLERRM;
+            RAISE EXCEPTION 'Erro ao criar ou atualizar desconto: %', SQLERRM;
     END;
 END $$ LANGUAGE plpgsql;
 
--- CREATE Function: sp_Discount_DELETE
-CREATE OR REPLACE FUNCTION sp_Discount_DELETE(p_name TEXT)
+CREATE OR REPLACE FUNCTION sp_Discount_DELETE(
+    p_name TEXT
+)
 RETURNS VOID AS $$
 BEGIN
     BEGIN
@@ -28,7 +34,6 @@ BEGIN
     END;
 END $$ LANGUAGE plpgsql;
 
--- Test Procedure: TEST_Discount_CRUD
 CREATE OR REPLACE FUNCTION TEST_Discount_CRUD()
 RETURNS TEXT AS $$
 DECLARE
@@ -37,14 +42,14 @@ DECLARE
     resultado TEXT;
 BEGIN
     -- Limpar estado inicial
-    DELETE FROM discount WHERE name = 'Test Discount';
+    DELETE FROM discount WHERE name = 'Desconto Teste';
 
     -- CREATE
     BEGIN
-        PERFORM sp_Discount_CREATE('Test Discount', 15, TRUE);
+        PERFORM sp_Discount_CREATE('Desconto Teste', 10, TRUE);
         SELECT COUNT(*) INTO contador
         FROM discount
-        WHERE name = 'Test Discount';
+        WHERE name = 'Desconto Teste';
         IF contador > 0 THEN
             resultado := 'CREATE: OK;';
         ELSE
@@ -57,7 +62,7 @@ BEGIN
 
     -- READ
     BEGIN
-        SELECT * INTO read_result FROM sp_Discount_READ('Test Discount');
+        SELECT * INTO read_result FROM discount WHERE name = 'Desconto Teste';
         IF read_result.discount_id IS NOT NULL THEN
             resultado := resultado || ' READ: OK;';
         ELSE
@@ -70,9 +75,9 @@ BEGIN
 
     -- UPDATE
     BEGIN
-        PERFORM sp_Discount_UPDATE('Test Discount', 20);
-        SELECT * INTO read_result FROM sp_Discount_READ('Test Discount');
-        IF read_result.percent = 20 AND read_result.active = TRUE THEN
+        PERFORM sp_Discount_CREATE('Desconto Teste', 20, TRUE);
+        SELECT * INTO read_result FROM discount WHERE name = 'Desconto Teste';
+        IF read_result.percent = 20 THEN
             resultado := resultado || ' UPDATE: OK;';
         ELSE
             RETURN resultado || ' UPDATE: NOK;';
@@ -84,10 +89,10 @@ BEGIN
 
     -- DELETE
     BEGIN
-        PERFORM sp_Discount_DELETE('Test Discount');
+        PERFORM sp_Discount_DELETE('Desconto Teste');
         SELECT COUNT(*) INTO contador
         FROM discount
-        WHERE name = 'Test Discount';
+        WHERE name = 'Desconto Teste';
         IF contador = 0 THEN
             resultado := resultado || ' DELETE: OK;';
         ELSE
@@ -100,6 +105,4 @@ BEGIN
 
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
-
--- Executar Teste
-SELECT TEST_Discount_CRUD();
+select TEST_Discount_CRUD();

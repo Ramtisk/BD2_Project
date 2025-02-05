@@ -1,3 +1,5 @@
+-- CRUD para Subscription
+
 CREATE OR REPLACE FUNCTION sp_Subscription_CREATE(
     p_user_id INTEGER,
     p_discount_id INTEGER,
@@ -7,51 +9,101 @@ CREATE OR REPLACE FUNCTION sp_Subscription_CREATE(
 RETURNS VOID AS $$
 BEGIN
     BEGIN
-        -- Tentar inserir uma nova assinatura
         INSERT INTO subscription (user_id, discount_id, start_date, end_date)
         VALUES (p_user_id, p_discount_id, p_start_date, p_end_date);
     EXCEPTION
         WHEN unique_violation THEN
-            -- Atualizar a assinatura existente
             UPDATE subscription
-            SET start_date = p_start_date, end_date = p_end_date
-            WHERE user_id = p_user_id AND discount_id = p_discount_id;
+            SET discount_id = p_discount_id, start_date = p_start_date, end_date = p_end_date
+            WHERE user_id = p_user_id;
         WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao criar ou atualizar assinatura: %', SQLERRM;
+            RAISE EXCEPTION 'Erro ao criar ou atualizar subscrição: %', SQLERRM;
     END;
 END $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION sp_Subscription_READ(
-    p_user_id INTEGER,
-    p_discount_id INTEGER
-)
-RETURNS TABLE(subscription_id INTEGER, user_id INTEGER, discount_id INTEGER, start_date TIMESTAMP, end_date TIMESTAMP) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        s.subscription_id,
-        s.user_id,
-        s.discount_id,
-        s.start_date,
-        s.end_date
-    FROM subscription s
-    WHERE s.user_id = p_user_id AND s.discount_id = p_discount_id;
-END $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION sp_Subscription_UPDATE(
-    p_user_id INTEGER,
-    p_discount_id INTEGER,
-    p_new_start_date TIMESTAMP,
-    p_new_end_date TIMESTAMP
+CREATE OR REPLACE FUNCTION sp_Subscription_DELETE(
+    p_subscription_id INTEGER
 )
 RETURNS VOID AS $$
 BEGIN
     BEGIN
-        UPDATE subscription
-        SET start_date = p_new_start_date, end_date = p_new_end_date
-        WHERE user_id = p_user_id AND discount_id = p_discount_id;
+        DELETE FROM subscription
+        WHERE subscription_id = p_subscription_id;
     EXCEPTION
         WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao atualizar assinatura: %', SQLERRM;
+            RAISE EXCEPTION 'Erro ao excluir subscrição: %', SQLERRM;
     END;
 END $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION TEST_Subscription_CRUD()
+RETURNS TEXT AS $$
+DECLARE
+    read_result RECORD;
+    contador INTEGER;
+    resultado TEXT;
+BEGIN
+    -- Limpar estado inicial
+    DELETE FROM subscription WHERE user_id = 999;
+
+    -- CREATE
+    BEGIN
+        PERFORM sp_Subscription_CREATE(999, NULL, NOW(), NOW() + INTERVAL '1 year');
+        SELECT COUNT(*) INTO contador
+        FROM subscription
+        WHERE user_id = 999;
+        IF contador > 0 THEN
+            resultado := 'CREATE: OK;';
+        ELSE
+            RETURN 'CREATE: NOK;';
+        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RETURN 'CREATE: NOK; Erro inesperado: ' || SQLERRM;
+    END;
+
+    -- READ
+    BEGIN
+        SELECT * INTO read_result FROM subscription WHERE user_id = 999;
+        IF read_result.subscription_id IS NOT NULL THEN
+            resultado := resultado || ' READ: OK;';
+        ELSE
+            RETURN resultado || ' READ: NOK;';
+        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RETURN resultado || ' READ: NOK; Erro inesperado: ' || SQLERRM;
+    END;
+
+    -- UPDATE
+    BEGIN
+        PERFORM sp_Subscription_CREATE(999, 1, NOW(), NOW() + INTERVAL '2 years');
+        SELECT * INTO read_result FROM subscription WHERE user_id = 999;
+        IF read_result.discount_id = 1 THEN
+            resultado := resultado || ' UPDATE: OK;';
+        ELSE
+            RETURN resultado || ' UPDATE: NOK;';
+        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RETURN resultado || ' UPDATE: NOK; Erro inesperado: ' || SQLERRM;
+    END;
+
+    -- DELETE
+    BEGIN
+        PERFORM sp_Subscription_DELETE(read_result.subscription_id);
+        SELECT COUNT(*) INTO contador
+        FROM subscription
+        WHERE user_id = 999;
+        IF contador = 0 THEN
+            resultado := resultado || ' DELETE: OK;';
+        ELSE
+            RETURN resultado || ' DELETE: NOK;';
+        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            RETURN resultado || ' DELETE: NOK; Erro inesperado: ' || SQLERRM;
+    END;
+
+    RETURN resultado;
+END $$ LANGUAGE plpgsql;
+select TEST_Subscription_CRUD();

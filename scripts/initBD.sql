@@ -1,14 +1,14 @@
 -------------------------------- Drop Tables --------------------------------
-DROP TABLE IF EXISTS PlanSubscription;
-DROP TABLE IF EXISTS PlanDevice;
-DROP TABLE IF EXISTS SubcriptionVisit;
-DROP TABLE IF EXISTS TecnicalVisit;
+DROP TABLE IF EXISTS Plan_Subscription;
+DROP TABLE IF EXISTS Plan_Device;
+DROP TABLE IF EXISTS Subcription_Visit;
+DROP TABLE IF EXISTS Tecnical_Visit;
 DROP TABLE IF EXISTS Payment;
 DROP TABLE IF EXISTS Subscription;
 DROP TABLE IF EXISTS Plan;
 DROP TABLE IF EXISTS Discount;
 DROP TABLE IF EXISTS Device;
-DROP TABLE IF EXISTS DevicesType;
+DROP TABLE IF EXISTS Devices_Type;
 DROP TABLE IF EXISTS Address;
 DROP TABLE IF EXISTS auth_group_permissions;
 DROP TABLE IF EXISTS auth_user_user_permissions;
@@ -75,7 +75,7 @@ CREATE TABLE Address (
     user_id INTEGER REFERENCES auth_user(id)
 );
 
-CREATE TABLE DevicesType (
+CREATE TABLE Devices_Type (
     device_type_id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE,
     description TEXT,
@@ -84,7 +84,7 @@ CREATE TABLE DevicesType (
 
 CREATE TABLE Device (
     device_id SERIAL PRIMARY KEY,
-    device_type_id INTEGER REFERENCES DevicesType(device_type_id),
+    device_type_id INTEGER REFERENCES Devices_Type(device_type_id),
     installation_date TIMESTAMP,
     serial_number TEXT
 );
@@ -100,7 +100,7 @@ CREATE TABLE Plan (
     plan_id SERIAL PRIMARY KEY,
     name TEXT,
     description TEXT,
-    image TEXT
+    image TEXT,
     price FLOAT CHECK (price >= 0.01),
     service_type VARCHAR(10) CHECK (service_type IN ('Telemovel', 'Internet', 'TV', 'Telefone'))
 );
@@ -123,7 +123,7 @@ CREATE TABLE Payment (
     refence TEXT
 );
 
-CREATE TABLE TecnicalVisit (
+CREATE TABLE Tecnical_Visit (
     tecnical_visit_id SERIAL PRIMARY KEY,
     tecnical_id INTEGER REFERENCES auth_user(id),
     device_id INTEGER REFERENCES Device(device_id),
@@ -131,20 +131,20 @@ CREATE TABLE TecnicalVisit (
     date TIMESTAMP
 );
 
-CREATE TABLE SubcriptionVisit (
+CREATE TABLE Subcription_Visit (
     subcription_visit_id SERIAL PRIMARY KEY,
     subscription_id INTEGER REFERENCES Subscription(subscription_id),
-    tecnical_visit_id INTEGER REFERENCES TecnicalVisit(tecnical_visit_id),
+    tecnical_visit_id INTEGER REFERENCES Tecnical_Visit(tecnical_visit_id),
     UNIQUE (subscription_id, tecnical_visit_id)
 );
 
-CREATE TABLE PlanDevice (
+CREATE TABLE Plan_Device (
     plan_device_id SERIAL PRIMARY KEY,
     plan_id INTEGER REFERENCES Plan(plan_id),
     device_id INTEGER REFERENCES Device(device_id)
 );
 
-CREATE TABLE PlanSubscription (
+CREATE TABLE Plan_Subscription (
     plan_subscription_id SERIAL PRIMARY KEY,
     plan_id INTEGER REFERENCES Plan(plan_id),
     subscription_id INTEGER REFERENCES Subscription(subscription_id)

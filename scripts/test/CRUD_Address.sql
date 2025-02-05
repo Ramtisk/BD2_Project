@@ -1,3 +1,5 @@
+-- CRUD para Address
+
 CREATE OR REPLACE FUNCTION sp_Address_CREATE(
     p_street TEXT,
     p_city TEXT,
@@ -8,29 +10,27 @@ CREATE OR REPLACE FUNCTION sp_Address_CREATE(
 RETURNS VOID AS $$
 BEGIN
     BEGIN
-        -- Tentar inserir um novo endereço
         INSERT INTO address (street, city, postal_code, country, user_id)
         VALUES (p_street, p_city, p_postal_code, p_country, p_user_id);
     EXCEPTION
         WHEN unique_violation THEN
-            -- Atualizar o endereço existente
             UPDATE address
-            SET street = p_street, city = p_city, postal_code = p_postal_code, country = p_country
-            WHERE user_id = p_user_id;
+            SET city = p_city, postal_code = p_postal_code, country = p_country
+            WHERE street = p_street AND user_id = p_user_id;
         WHEN OTHERS THEN
             RAISE EXCEPTION 'Erro ao criar ou atualizar endereço: %', SQLERRM;
     END;
 END $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE FUNCTION sp_Address_DELETE(
-    p_street TEXT
+    p_street TEXT,
+    p_user_id INTEGER
 )
 RETURNS VOID AS $$
 BEGIN
     BEGIN
         DELETE FROM address
-        WHERE street = p_street;
+        WHERE street = p_street AND user_id = p_user_id;
     EXCEPTION
         WHEN OTHERS THEN
             RAISE EXCEPTION 'Erro ao excluir endereço: %', SQLERRM;
@@ -47,9 +47,9 @@ BEGIN
     -- Limpar estado inicial
     DELETE FROM address WHERE street = 'Rua Teste';
 
-    -- CREATE com user_id = 2
+    -- CREATE
     BEGIN
-        PERFORM sp_Address_CREATE('Rua Teste', 'Lisboa', '1000-123', 'Portugal', 2);
+        PERFORM sp_Address_CREATE('Rua Teste', 'Lisboa', '1000-123', 'Portugal', 1);
         SELECT COUNT(*) INTO contador
         FROM address
         WHERE street = 'Rua Teste';
@@ -65,7 +65,7 @@ BEGIN
 
     -- READ
     BEGIN
-        SELECT * INTO read_result FROM sp_Address_READ('Rua Teste');
+        SELECT * INTO read_result FROM address WHERE street = 'Rua Teste';
         IF read_result.address_id IS NOT NULL THEN
             resultado := resultado || ' READ: OK;';
         ELSE
@@ -78,8 +78,8 @@ BEGIN
 
     -- UPDATE
     BEGIN
-        PERFORM sp_Address_UPDATE('Rua Teste', 'Porto');
-        SELECT * INTO read_result FROM sp_Address_READ('Rua Teste');
+        PERFORM sp_Address_CREATE('Rua Teste', 'Porto', '2000-456', 'Portugal', 1);
+        SELECT * INTO read_result FROM address WHERE street = 'Rua Teste';
         IF read_result.city = 'Porto' THEN
             resultado := resultado || ' UPDATE: OK;';
         ELSE
@@ -92,7 +92,7 @@ BEGIN
 
     -- DELETE
     BEGIN
-        PERFORM sp_Address_DELETE('Rua Teste');
+        PERFORM sp_Address_DELETE('Rua Teste', 1);
         SELECT COUNT(*) INTO contador
         FROM address
         WHERE street = 'Rua Teste';
@@ -109,4 +109,4 @@ BEGIN
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
 
-SELECT TEST_Address_CRUD();
+select TEST_Address_CRUD();

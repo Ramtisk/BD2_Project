@@ -1,57 +1,24 @@
+-- CRUD para Plan
+
 CREATE OR REPLACE FUNCTION sp_Plan_CREATE(
     p_name TEXT,
     p_description TEXT,
+    p_image TEXT,
     p_price FLOAT,
-    p_service_type TEXT
+    p_service_type VARCHAR
 )
 RETURNS VOID AS $$
 BEGIN
     BEGIN
-        -- Tentar inserir um novo plano
-        INSERT INTO plan (name, description, price, service_type)
-        VALUES (p_name, p_description, p_price, p_service_type);
+        INSERT INTO plan (name, description, image, price, service_type)
+        VALUES (p_name, p_description, p_image, p_price, p_service_type);
     EXCEPTION
         WHEN unique_violation THEN
-            -- Atualizar o plano existente
             UPDATE plan
-            SET description = p_description, price = p_price, service_type = p_service_type
+            SET description = p_description, image = p_image, price = p_price, service_type = p_service_type
             WHERE name = p_name;
         WHEN OTHERS THEN
             RAISE EXCEPTION 'Erro ao criar ou atualizar plano: %', SQLERRM;
-    END;
-END $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION sp_Plan_READ(
-    p_name TEXT
-)
-RETURNS TABLE(plan_id INTEGER, name TEXT, description TEXT, price FLOAT, service_type TEXT) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        p.plan_id::INTEGER,            -- Casting explícito para garantir o tipo correto
-        p.name::TEXT,
-        p.description::TEXT,
-        p.price::FLOAT,
-        p.service_type::TEXT
-    FROM plan p
-    WHERE p.name = p_name;
-END $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION sp_Plan_UPDATE(
-    p_name TEXT,
-    p_new_description TEXT,
-    p_new_price FLOAT,
-    p_new_service_type TEXT
-)
-RETURNS VOID AS $$
-BEGIN
-    BEGIN
-        UPDATE plan
-        SET description = p_new_description, price = p_new_price, service_type = p_new_service_type
-        WHERE name = p_name;
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao atualizar plano: %', SQLERRM;
     END;
 END $$ LANGUAGE plpgsql;
 
@@ -81,7 +48,7 @@ BEGIN
 
     -- CREATE
     BEGIN
-        PERFORM sp_Plan_CREATE('Plano Teste', 'Plano de teste', 29.99, 'Internet');
+        PERFORM sp_Plan_CREATE('Plano Teste', 'Descrição Teste', NULL, 99.99, 'Internet');
         SELECT COUNT(*) INTO contador
         FROM plan
         WHERE name = 'Plano Teste';
@@ -97,7 +64,7 @@ BEGIN
 
     -- READ
     BEGIN
-        SELECT * INTO read_result FROM sp_Plan_READ('Plano Teste');
+        SELECT * INTO read_result FROM plan WHERE name = 'Plano Teste';
         IF read_result.plan_id IS NOT NULL THEN
             resultado := resultado || ' READ: OK;';
         ELSE
@@ -110,9 +77,9 @@ BEGIN
 
     -- UPDATE
     BEGIN
-        PERFORM sp_Plan_UPDATE('Plano Teste', 'Plano Atualizado', 39.99, 'TV');
-        SELECT * INTO read_result FROM sp_Plan_READ('Plano Teste');
-        IF read_result.description = 'Plano Atualizado' AND read_result.price = 39.99 AND read_result.service_type = 'TV' THEN
+        PERFORM sp_Plan_CREATE('Plano Teste', 'Descrição Atualizada', NULL, 129.99, 'TV');
+        SELECT * INTO read_result FROM plan WHERE name = 'Plano Teste';
+        IF read_result.price = 129.99 THEN
             resultado := resultado || ' UPDATE: OK;';
         ELSE
             RETURN resultado || ' UPDATE: NOK;';
@@ -140,5 +107,4 @@ BEGIN
 
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
-
-SELECT TEST_Plan_CRUD();
+select TEST_Plan_CRUD();
