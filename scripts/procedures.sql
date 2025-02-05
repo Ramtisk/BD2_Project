@@ -92,3 +92,28 @@ BEGIN
     END LOOP;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE adjust_all_sequences()
+LANGUAGE plpgsql
+AS $$
+DECLARE 
+    r RECORD;
+BEGIN 
+    FOR r IN (
+        SELECT c.oid::regclass AS table_name, 
+               a.attname AS column_name, 
+               pg_get_serial_sequence(c.oid::regclass::text, a.attname) AS sequence_name 
+        FROM pg_class c
+        JOIN pg_attribute a ON c.oid = a.attrelid 
+        WHERE c.relkind = 'r' 
+        AND a.attnum > 0 
+        AND NOT a.attisdropped -- Evita colunas deletadas
+        AND pg_get_serial_sequence(c.oid::regclass::text, a.attname) IS NOT NULL
+    ) 
+    LOOP 
+        EXECUTE format(
+            'SELECT setval(''%s'', COALESCE((SELECT MAX(%I) FROM %I), 0) + 1, false);', 
+            r.sequence_name, r.column_name, r.table_name
+        );
+    END LOOP; 
+END $$;
