@@ -1,5 +1,32 @@
-<h1>Bem-vindo, Fornecedor!</h1>
-<ul>
-    <li><a href="{% url 'manage_devices' %}">Gerenciar Dispositivos</a></li>
-    <li><a href="{% url 'manage_devices_type' %}">Gerenciar Tipos de Dispositivo</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página do Fornecedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Bem-vindo, Fornecedor!</h1>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Gerenciar Dispositivos</h5>
+                        <a href="{% url 'manage_devices' %}" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Gerenciar Tipos de Dispositivo</h5>
+                        <a href="{% url 'manage_devices_type' %}" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,41 +1,45 @@
--- CRUD para Discount
+-- ============================================================
+-- CRUD para Discount (Corrigido)
+-- ============================================================
 
+-- Função para criar ou atualizar um desconto
 CREATE OR REPLACE FUNCTION sp_Discount_CREATE(
     p_name TEXT,
     p_percent INTEGER,
     p_active BOOLEAN
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        INSERT INTO discount (name, percent, active)
-        VALUES (p_name, p_percent, p_active);
-    EXCEPTION
-        WHEN unique_violation THEN
-            UPDATE discount
-            SET percent = p_percent, active = p_active
-            WHERE name = p_name;
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao criar ou atualizar desconto: %', SQLERRM;
-    END;
+    -- Valida se o percentual está entre 1 e 100
+    IF p_percent < 1 OR p_percent > 100 THEN
+        RAISE EXCEPTION 'Erro: O percentual de desconto (%) deve estar entre 1 e 100.', p_percent;
+    END IF;
+
+    -- Insere ou atualiza o desconto automaticamente evitando duplicações
+    INSERT INTO discount (name, percent, active)
+    VALUES (p_name, p_percent, p_active)
+    ON CONFLICT (name) -- Se já existir um desconto com esse nome
+    DO UPDATE 
+    SET percent = EXCLUDED.percent, active = EXCLUDED.active;
 END $$ LANGUAGE plpgsql;
 
+-- Função para deletar um desconto
 CREATE OR REPLACE FUNCTION sp_Discount_DELETE(
     p_name TEXT
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        DELETE FROM discount
-        WHERE name = p_name;
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao excluir desconto: %', SQLERRM;
-    END;
+    -- Verifica se o desconto existe antes de excluir
+    IF EXISTS (SELECT 1 FROM discount WHERE name = p_name) THEN
+        DELETE FROM discount WHERE name = p_name;
+    ELSE
+        RAISE EXCEPTION 'Erro: Nenhum desconto encontrado com o nome "%".', p_name;
+    END IF;
 END $$ LANGUAGE plpgsql;
 
+-- Função para testar o CRUD do Discount
 CREATE OR REPLACE FUNCTION TEST_Discount_CRUD()
-RETURNS TEXT AS $$
+RETURNS TEXT AS $$ 
 DECLARE
     read_result RECORD;
     contador INTEGER;
@@ -47,9 +51,7 @@ BEGIN
     -- CREATE
     BEGIN
         PERFORM sp_Discount_CREATE('Desconto Teste', 10, TRUE);
-        SELECT COUNT(*) INTO contador
-        FROM discount
-        WHERE name = 'Desconto Teste';
+        SELECT COUNT(*) INTO contador FROM discount WHERE name = 'Desconto Teste';
         IF contador > 0 THEN
             resultado := 'CREATE: OK;';
         ELSE
@@ -90,9 +92,7 @@ BEGIN
     -- DELETE
     BEGIN
         PERFORM sp_Discount_DELETE('Desconto Teste');
-        SELECT COUNT(*) INTO contador
-        FROM discount
-        WHERE name = 'Desconto Teste';
+        SELECT COUNT(*) INTO contador FROM discount WHERE name = 'Desconto Teste';
         IF contador = 0 THEN
             resultado := resultado || ' DELETE: OK;';
         ELSE
@@ -105,4 +105,6 @@ BEGIN
 
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
-select TEST_Discount_CRUD();
+
+-- Executar teste
+SELECT TEST_Discount_CRUD();

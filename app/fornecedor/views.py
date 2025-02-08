@@ -14,7 +14,6 @@ def fornecedor_home(request):
         return redirect('login')
     return render(request, 'fornecedor_home.html')
 
-
 def manage_devices(request):
     if request.session.get('user_group') != 'fornecedor':
         messages.error(request, "Acesso negado.")

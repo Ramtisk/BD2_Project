@@ -17,15 +17,14 @@ def login_view(request):
         password = request.POST.get('password')
         
         user = authenticate(request, username=username, password=password)
-        
         if user is not None:
             login(request, user)
             
             # Determinar o grupo do utilizador
             if user.is_superuser:
                 request.session['user_group'] = 'admin'
-            elif user.groups.filter(name='cliente').exists():
-                request.session['user_group'] = 'cliente'
+            elif user.groups.filter(name='client').exists():
+                request.session['user_group'] = 'client'
             elif user.groups.filter(name='fornecedor').exists():
                 request.session['user_group'] = 'fornecedor'
             else:
@@ -34,8 +33,8 @@ def login_view(request):
             # Redirecionar com base no grupo do utilizador
             if request.session['user_group'] == 'admin':
                 return redirect('adminHome')  # Página do admin
-            elif request.session['user_group'] == 'cliente':
-                return redirect('clientHome')  # Página do cliente
+            elif request.session['user_group'] == 'client':
+                return redirect('clientHome')  # Página do client
             elif request.session['user_group'] == 'fornecedor':
                 return redirect('fornecedor_home')  # Página do fornecedor
             else:

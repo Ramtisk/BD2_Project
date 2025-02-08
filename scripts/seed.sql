@@ -20,10 +20,10 @@ DELETE FROM Plan_Subscription;
 -- Inserindo dados na tabela auth_user
 INSERT INTO auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined)
 VALUES
-(2, 'password2', NULL, FALSE, 'maria_oliveira', 'Maria', 'Oliveira', 'maria.oliveira@example.com', FALSE, TRUE, NOW()),
-(3, 'password3', NULL, FALSE, 'antonio_santos', 'António', 'Santos', 'antonio.santos@example.com', FALSE, TRUE, NOW()),
-(4, 'password4', NULL, FALSE, 'paulinho_andrade', 'Paulo', 'Andrade', 'pandrade@example.com', FALSE, TRUE, NOW()),
-(5, 'password1', NULL, TRUE, 'joao_silva', 'João', 'Silva', 'joao.silva@example.com', TRUE, TRUE, NOW());
+(2, 'pbkdf2_sha256$216000$wNlEIFL4aDXT$vcQsjNuqE+06PnoXDQ9IFDRjbnwdDheevkE+K6S8CDA=', NULL, FALSE, 'maria_oliveira', 'Maria', 'Oliveira', 'maria.oliveira@example.com', FALSE, TRUE, NOW()),
+(3, 'pbkdf2_sha256$216000$wNlEIFL4aDXT$vcQsjNuqE+06PnoXDQ9IFDRjbnwdDheevkE+K6S8CDA=', NULL, FALSE, 'antonio_santos', 'António', 'Santos', 'antonio.santos@example.com', FALSE, TRUE, NOW()),
+(4, 'pbkdf2_sha256$216000$wNlEIFL4aDXT$vcQsjNuqE+06PnoXDQ9IFDRjbnwdDheevkE+K6S8CDA=', NULL, FALSE, 'paulinho_andrade', 'Paulo', 'Andrade', 'pandrade@example.com', FALSE, TRUE, NOW()),
+(5, 'pbkdf2_sha256$216000$wNlEIFL4aDXT$vcQsjNuqE+06PnoXDQ9IFDRjbnwdDheevkE+K6S8CDA=', NULL, TRUE, 'joao_silva', 'João', 'Silva', 'joao.silva@example.com', TRUE, TRUE, NOW());
 
 -- Inserindo dados na tabela auth_group
 INSERT INTO auth_group (id, name)
