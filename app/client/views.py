@@ -5,10 +5,20 @@ from django.shortcuts import render, redirect,get_object_or_404
 from project.models import Plan, Subscription, PlanSubscription
 from django.utils.timezone import now
 from django.db import connection
+from project.models import AppLogs
+
+def log_action(action_type, table, action, description):
+    AppLogs.objects.create(
+        type=action_type,
+        tabela=table,
+        action=action,
+        description=description
+    )
 
 def ClientView(request):
     if request.session.get('user_group') not in ['admin', 'client' ]:
         messages.error(request, "Acesso negado.")
+        log_action('Error', 'Client', 'View', 'Error ao fazer login')
         return redirect('login')
     if request.method == 'GET':
         user = request.user.username  # Obtém o username do cliente logado
@@ -45,6 +55,7 @@ def ClientSignView(request, id):
             plan=plan,
             subscription=subscription,
         )
+        log_action('INFO', 'Subscription', 'POST', 'Uma subscricao foi efetuda.')
         return redirect('clientHome');
 
     elif request.method == 'PUT':
@@ -54,6 +65,7 @@ def ClientSignView(request, id):
             subscription.end_date = now()
             subscription.save()
 
+        log_action('INFO', 'Subscription', 'POST', 'Uma subscricao foi cancelada.')
         return redirect('clientHome')
 
     return JsonResponse({'error': 'Método não permitido'}, status=405)

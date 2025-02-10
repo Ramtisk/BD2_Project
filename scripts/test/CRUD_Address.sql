@@ -120,5 +120,5 @@ BEGIN
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
 
---  Executar teste
+-- Executar teste
 SELECT TEST_Address_CRUD();

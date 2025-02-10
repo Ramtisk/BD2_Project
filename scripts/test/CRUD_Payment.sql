@@ -1,84 +1,129 @@
+-- ============================================================
+-- Removendo funções antigas antes de recriar
+-- ============================================================
+DROP FUNCTION IF EXISTS sp_Payment_CREATE CASCADE;
+DROP FUNCTION IF EXISTS sp_Payment_READ CASCADE;
+DROP FUNCTION IF EXISTS sp_Payment_UPDATE CASCADE;
+DROP FUNCTION IF EXISTS sp_Payment_DELETE CASCADE;
+DROP FUNCTION IF EXISTS TEST_Payment_CRUD CASCADE;
+
+-- ============================================================
+-- NOTA: 
+-- O erro de escrita na coluna "refence" foi identificado,
+-- mas optamos por manter essa nomenclatura para evitar alterações estruturais.
+-- ============================================================
+
+-- Criar a constraint UNIQUE apenas se ela ainda não existir
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.table_constraints 
+        WHERE constraint_name = 'unique_subscription_user' 
+        AND table_name = 'payment'
+    ) THEN
+        ALTER TABLE payment ADD CONSTRAINT unique_subscription_user UNIQUE (subscription_id, user_id);
+    END IF;
+END $$;
+
+-- ============================================================
+-- Função para criar ou atualizar um pagamento
+-- ============================================================
 CREATE OR REPLACE FUNCTION sp_Payment_CREATE(
     p_subscription_id INTEGER,
     p_user_id INTEGER,
     p_amount FLOAT,
     p_date TIMESTAMP,
     p_entity TEXT,
-    p_reference TEXT
+    p_refence TEXT  -- Mantendo "refence"
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        -- Tentar inserir um novo pagamento
-        INSERT INTO payment (subscription_id, user_id, amount, date, entity, refence)
-        VALUES (p_subscription_id, p_user_id, p_amount, p_date, p_entity, p_reference);
-    EXCEPTION
-        WHEN unique_violation THEN
-            -- Atualizar o pagamento existente
-            UPDATE payment
-            SET amount = p_amount, date = p_date, entity = p_entity, refence = p_reference
-            WHERE subscription_id = p_subscription_id AND user_id = p_user_id;
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao criar ou atualizar pagamento: %', SQLERRM;
-    END;
+    -- Verifica se subscription e usuário existem antes de inserir
+    IF NOT EXISTS (SELECT 1 FROM subscription WHERE subscription_id = p_subscription_id) THEN
+        RAISE EXCEPTION 'Erro: A subscription_id "%" não existe.', p_subscription_id;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM auth_user WHERE id = p_user_id) THEN
+        RAISE EXCEPTION 'Erro: O user_id "%" não existe.', p_user_id;
+    END IF;
+
+    -- Insere ou atualiza evitando duplicação
+    INSERT INTO payment (subscription_id, user_id, amount, date, entity, refence)
+    VALUES (p_subscription_id, p_user_id, p_amount, p_date, p_entity, p_refence)
+    ON CONFLICT (subscription_id, user_id) 
+    DO UPDATE 
+    SET amount = EXCLUDED.amount, date = EXCLUDED.date, entity = EXCLUDED.entity, refence = EXCLUDED.refence;
 END $$ LANGUAGE plpgsql;
 
+-- ============================================================
+-- Função para ler um pagamento
+-- ============================================================
 CREATE OR REPLACE FUNCTION sp_Payment_READ(
     p_subscription_id INTEGER,
     p_user_id INTEGER
 )
-RETURNS TABLE(payment_id INTEGER, subscription_id INTEGER, user_id INTEGER, amount FLOAT, date TIMESTAMP, entity TEXT, reference TEXT) AS $$
+RETURNS TABLE(payment_id INTEGER, subscription_id INTEGER, user_id INTEGER, amount FLOAT, date TIMESTAMP, entity TEXT, refence TEXT) AS $$ 
 BEGIN
     RETURN QUERY
-    SELECT
-        p.payment_id::INTEGER,
-        p.subscription_id::INTEGER,
-        p.user_id::INTEGER,
-        p.amount::FLOAT,
-        p.date::TIMESTAMP,
-        p.entity::TEXT,
+    SELECT 
+        p.payment_id::INTEGER, 
+        p.subscription_id::INTEGER, 
+        p.user_id::INTEGER, 
+        p.amount::FLOAT, 
+        p.date::TIMESTAMP, 
+        p.entity::TEXT, 
         p.refence::TEXT
     FROM payment p
     WHERE p.subscription_id = p_subscription_id AND p.user_id = p_user_id;
 END $$ LANGUAGE plpgsql;
 
+-- ============================================================
+-- Função para atualizar um pagamento
+-- ============================================================
 CREATE OR REPLACE FUNCTION sp_Payment_UPDATE(
     p_subscription_id INTEGER,
     p_user_id INTEGER,
     p_new_amount FLOAT,
     p_new_date TIMESTAMP,
     p_new_entity TEXT,
-    p_new_reference TEXT
+    p_new_refence TEXT
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        UPDATE payment
-        SET amount = p_new_amount, date = p_new_date, entity = p_new_entity, refence = p_new_reference
-        WHERE subscription_id = p_subscription_id AND user_id = p_user_id;
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao atualizar pagamento: %', SQLERRM;
-    END;
+    -- Verifica se o pagamento existe antes de atualizar
+    IF NOT EXISTS (SELECT 1 FROM payment WHERE subscription_id = p_subscription_id AND user_id = p_user_id) THEN
+        RAISE EXCEPTION 'Erro: Nenhum pagamento encontrado para subscription_id "%" e user_id "%".', p_subscription_id, p_user_id;
+    END IF;
+
+    -- Atualiza os dados do pagamento
+    UPDATE payment
+    SET amount = p_new_amount, date = p_new_date, entity = p_new_entity, refence = p_new_refence
+    WHERE subscription_id = p_subscription_id AND user_id = p_user_id;
 END $$ LANGUAGE plpgsql;
 
+-- ============================================================
+-- Função para deletar um pagamento
+-- ============================================================
 CREATE OR REPLACE FUNCTION sp_Payment_DELETE(
     p_subscription_id INTEGER,
     p_user_id INTEGER
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        DELETE FROM payment
-        WHERE subscription_id = p_subscription_id AND user_id = p_user_id;
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao excluir pagamento: %', SQLERRM;
-    END;
+    -- Verifica se o pagamento existe antes de excluir
+    IF EXISTS (SELECT 1 FROM payment WHERE subscription_id = p_subscription_id AND user_id = p_user_id) THEN
+        DELETE FROM payment WHERE subscription_id = p_subscription_id AND user_id = p_user_id;
+    ELSE
+        RAISE EXCEPTION 'Erro: Nenhum pagamento encontrado para subscription_id "%" e user_id "%".', p_subscription_id, p_user_id;
+    END IF;
 END $$ LANGUAGE plpgsql;
 
+-- ============================================================
+-- Função para testar o CRUD do Payment
+-- ============================================================
 CREATE OR REPLACE FUNCTION TEST_Payment_CRUD()
-RETURNS TEXT AS $$
+RETURNS TEXT AS $$ 
 DECLARE
     read_result RECORD;
     contador INTEGER;
@@ -89,10 +134,8 @@ BEGIN
 
     -- CREATE
     BEGIN
-        PERFORM sp_Payment_CREATE(1, 1, 100.50, '2023-01-01 10:00:00', 'Banco A', 'REF123');
-        SELECT COUNT(*) INTO contador
-        FROM payment
-        WHERE subscription_id = 1 AND user_id = 1;
+        PERFORM sp_Payment_CREATE(1, 1, 100.50, '2025-02-08 10:00:00', 'Banco A', 'REF123');
+        SELECT COUNT(*) INTO contador FROM payment WHERE subscription_id = 1 AND user_id = 1;
         IF contador > 0 THEN
             resultado := 'CREATE: OK;';
         ELSE
@@ -118,9 +161,9 @@ BEGIN
 
     -- UPDATE
     BEGIN
-        PERFORM sp_Payment_UPDATE(1, 1, 200.75, '2023-02-01 10:00:00', 'Banco B', 'REF456');
+        PERFORM sp_Payment_UPDATE(1, 1, 200.75, '2025-02-10 15:00:00', 'Banco B', 'REF456');
         SELECT * INTO read_result FROM sp_Payment_READ(1, 1);
-        IF read_result.amount = 200.75 AND read_result.date = '2023-02-01 10:00:00' AND read_result.entity = 'Banco B' THEN
+        IF read_result.amount = 200.75 AND read_result.date = '2025-02-10 15:00:00' AND read_result.entity = 'Banco B' THEN
             resultado := resultado || ' UPDATE: OK;';
         ELSE
             RETURN resultado || ' UPDATE: NOK;';
@@ -133,9 +176,7 @@ BEGIN
     -- DELETE
     BEGIN
         PERFORM sp_Payment_DELETE(1, 1);
-        SELECT COUNT(*) INTO contador
-        FROM payment
-        WHERE subscription_id = 1 AND user_id = 1;
+        SELECT COUNT(*) INTO contador FROM payment WHERE subscription_id = 1 AND user_id = 1;
         IF contador = 0 THEN
             resultado := resultado || ' DELETE: OK;';
         ELSE
@@ -149,4 +190,5 @@ BEGIN
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
 
+-- Executar teste
 SELECT TEST_Payment_CRUD();

@@ -1,57 +1,94 @@
--- CRUD para Subscription
+-- ===============================
+-- DROP das funções para evitar conflitos
+-- ===============================
+DROP FUNCTION IF EXISTS sp_Subscription_CREATE(
+    INTEGER, INTEGER, TIMESTAMP, TIMESTAMP
+) CASCADE;
 
+DROP FUNCTION IF EXISTS sp_Subscription_DELETE(
+    INTEGER
+) CASCADE;
+
+DROP FUNCTION IF EXISTS TEST_Subscription_CRUD() CASCADE;
+
+-- ===============================
+-- Garantir que o usuário 999 existe antes da criação da assinatura
+-- ===============================
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM auth_user WHERE id = 999) THEN
+        INSERT INTO auth_user (id, username, password, email, is_active, is_staff, is_superuser, date_joined)
+        VALUES (999, 'temp_user', 'temp_password', 'temp_user@email.com', TRUE, FALSE, FALSE, NOW());
+    END IF;
+END $$;
+
+-- ===============================
+-- Garantir que a sequência do subscription_id está correta
+-- ===============================
+SELECT setval(pg_get_serial_sequence('subscription', 'subscription_id'),
+              COALESCE((SELECT MAX(subscription_id) FROM subscription), 0) + 1, FALSE);
+
+-- ===============================
+-- Função CREATE/UPDATE para Subscription
+-- ===============================
 CREATE OR REPLACE FUNCTION sp_Subscription_CREATE(
     p_user_id INTEGER,
-    p_discount_id INTEGER,
-    p_start_date TIMESTAMP,
-    p_end_date TIMESTAMP
+    p_discount_id INTEGER DEFAULT NULL,
+    p_start_date TIMESTAMP DEFAULT NOW(),
+    p_end_date TIMESTAMP DEFAULT NOW() + INTERVAL '1 year'
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
+DECLARE
+    existing_subscription_id INTEGER;
 BEGIN
-    BEGIN
+    -- Verificar se o usuário já tem uma assinatura
+    SELECT subscription_id INTO existing_subscription_id 
+    FROM subscription 
+    WHERE user_id = p_user_id 
+    ORDER BY subscription_id DESC LIMIT 1;
+
+    IF existing_subscription_id IS NOT NULL THEN
+        -- Atualizar a assinatura existente
+        UPDATE subscription
+        SET discount_id = p_discount_id, start_date = p_start_date, end_date = p_end_date
+        WHERE subscription_id = existing_subscription_id;
+    ELSE
+        -- Criar nova assinatura
         INSERT INTO subscription (user_id, discount_id, start_date, end_date)
         VALUES (p_user_id, p_discount_id, p_start_date, p_end_date);
-    EXCEPTION
-        WHEN unique_violation THEN
-            UPDATE subscription
-            SET discount_id = p_discount_id, start_date = p_start_date, end_date = p_end_date
-            WHERE user_id = p_user_id;
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao criar ou atualizar subscrição: %', SQLERRM;
-    END;
+    END IF;
 END $$ LANGUAGE plpgsql;
 
+-- ===============================
+-- Função DELETE para Subscription
+-- ===============================
 CREATE OR REPLACE FUNCTION sp_Subscription_DELETE(
     p_subscription_id INTEGER
 )
-RETURNS VOID AS $$
+RETURNS VOID AS $$ 
 BEGIN
-    BEGIN
-        DELETE FROM subscription
-        WHERE subscription_id = p_subscription_id;
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Erro ao excluir subscrição: %', SQLERRM;
-    END;
+    DELETE FROM subscription WHERE subscription_id = p_subscription_id;
 END $$ LANGUAGE plpgsql;
 
+-- ===============================
+-- Teste automatizado para Subscription
+-- ===============================
 CREATE OR REPLACE FUNCTION TEST_Subscription_CRUD()
-RETURNS TEXT AS $$
+RETURNS TEXT AS $$ 
 DECLARE
     read_result RECORD;
     contador INTEGER;
     resultado TEXT;
+    sub_id INTEGER;
 BEGIN
     -- Limpar estado inicial
     DELETE FROM subscription WHERE user_id = 999;
 
     -- CREATE
     BEGIN
-        PERFORM sp_Subscription_CREATE(999, NULL, NOW(), NOW() + INTERVAL '1 year');
-        SELECT COUNT(*) INTO contador
-        FROM subscription
-        WHERE user_id = 999;
-        IF contador > 0 THEN
+        PERFORM sp_Subscription_CREATE(999);
+        SELECT subscription_id INTO sub_id FROM subscription WHERE user_id = 999;
+        IF sub_id IS NOT NULL THEN
             resultado := 'CREATE: OK;';
         ELSE
             RETURN 'CREATE: NOK;';
@@ -63,7 +100,7 @@ BEGIN
 
     -- READ
     BEGIN
-        SELECT * INTO read_result FROM subscription WHERE user_id = 999;
+        SELECT * INTO read_result FROM subscription WHERE subscription_id = sub_id;
         IF read_result.subscription_id IS NOT NULL THEN
             resultado := resultado || ' READ: OK;';
         ELSE
@@ -76,8 +113,8 @@ BEGIN
 
     -- UPDATE
     BEGIN
-        PERFORM sp_Subscription_CREATE(999, 1, NOW(), NOW() + INTERVAL '2 years');
-        SELECT * INTO read_result FROM subscription WHERE user_id = 999;
+        PERFORM sp_Subscription_CREATE(999, 1);
+        SELECT * INTO read_result FROM subscription WHERE subscription_id = sub_id;
         IF read_result.discount_id = 1 THEN
             resultado := resultado || ' UPDATE: OK;';
         ELSE
@@ -90,10 +127,8 @@ BEGIN
 
     -- DELETE
     BEGIN
-        PERFORM sp_Subscription_DELETE(read_result.subscription_id);
-        SELECT COUNT(*) INTO contador
-        FROM subscription
-        WHERE user_id = 999;
+        PERFORM sp_Subscription_DELETE(sub_id);
+        SELECT COUNT(*) INTO contador FROM subscription WHERE subscription_id = sub_id;
         IF contador = 0 THEN
             resultado := resultado || ' DELETE: OK;';
         ELSE
@@ -106,4 +141,8 @@ BEGIN
 
     RETURN resultado;
 END $$ LANGUAGE plpgsql;
-select TEST_Subscription_CRUD();
+
+-- ===============================
+-- Executar o teste
+-- ===============================
+SELECT TEST_Subscription_CRUD();
